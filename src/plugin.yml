@@ -1,0 +1,4 @@
+main: ca.como89.myapi.MyApiPlugin
+name: MyApi
+version: 1.0
+author: como89
