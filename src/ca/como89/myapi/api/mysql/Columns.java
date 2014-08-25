@@ -8,6 +8,7 @@ public class Columns {
 	private boolean autoIncremented;
 	private int value;
 	private boolean primary;
+	private boolean unique;
 	
 	/**
 	 * The constructor of columns. 
@@ -16,13 +17,15 @@ public class Columns {
 	 * @param value - The length of the type or the value of the data.
 	 * @param isNull - If this column can be null.
 	 * @param primary - If this column is primary.
+	 * @param unique - If the values of this column are unique. 
 	 * @param autoIncremented - If this column can be autoIncremented.
 	 */
-	public Columns(String colomnName,TypeData typeData,int value,boolean isNull,boolean primary,boolean autoIncremented){
+	public Columns(String colomnName,TypeData typeData,int value,boolean isNull,boolean primary,boolean unique, boolean autoIncremented){
 		this.colomnName = colomnName;
 		this.typeData = typeData;
 		this.isNull = isNull;
 		this.primary = primary;
+		this.unique = unique;
 		this.autoIncremented = autoIncremented;
 		this.value = value;
 	}
@@ -51,4 +54,7 @@ public class Columns {
 		return autoIncremented;
 	}
 	
+	public boolean isUnique(){
+		return unique;
+	}
 }

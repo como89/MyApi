@@ -12,6 +12,7 @@ import ca.como89.myapi.api.TableData;
 import ca.como89.myapi.api.mysql.Columns;
 import ca.como89.myapi.api.mysql.Condition;
 import ca.como89.myapi.api.mysql.TableProperties;
+import ca.como89.myapi.api.mysql.TypeAlter;
 import ca.como89.myapi.api.mysql.exception.LengthTableException;
 
 public class DataManager {
@@ -37,6 +38,35 @@ public class DataManager {
 			connect.close();
 		}
 	}
+	
+	// TODO: Add alterTable.
+	public ApiResponse alterTable(String tableName,List<Columns> listColumns, TypeAlter type, boolean hisIgnore){
+		return null;
+	}
+
+	public ApiResponse deleteValue(String tableName, Condition condition) throws IllegalArgumentException{
+		Statement stat = null;
+		try {
+			if(connect == null && connect.isClosed())
+				return ApiResponse.MYSQL_NOT_CONNECT;
+			if(tableName == null || condition == null)
+				throw new IllegalArgumentException("An argument is null.");
+			stat = connect.createStatement();
+			stat.execute("DELETE FROM " + tableName + " WHERE " + condition.getColumn() + " " + condition.getTypeCondition().getTypeInString() + " " + condition.getValue());
+		}catch(SQLException e){
+			e.printStackTrace();
+			return ApiResponse.ERROR;
+		}
+		finally {
+			if (stat != null)
+				try {
+					stat.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return ApiResponse.SUCCESS;
+	}
 
 	public ApiResponse createTable(String tableName, List<Columns> listColumns,
 			boolean existCondition) {
@@ -51,7 +81,6 @@ public class DataManager {
 			stat.execute("CREATE TABLE "
 					+ (existCondition ? "IF NOT EXISTS " : "") + "" + tableName
 					+ " (" + columnString + ")");
-			return ApiResponse.SUCCESS;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return ApiResponse.ERROR;
@@ -63,6 +92,7 @@ public class DataManager {
 					e.printStackTrace();
 				}
 		}
+		return ApiResponse.SUCCESS;
 	}
 	
 	public ApiResponse deleteTable(String tableName) throws IllegalArgumentException{
@@ -74,7 +104,6 @@ public class DataManager {
 				throw new IllegalArgumentException("An argument is null.");
 			stat = connect.createStatement();
 			stat.execute("DROP TABLE IF EXISTS " + tableName);
-			return ApiResponse.SUCCESS;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return ApiResponse.ERROR;
@@ -86,6 +115,7 @@ public class DataManager {
 					e.printStackTrace();
 				}
 		}
+		return ApiResponse.SUCCESS;
 	}
 
 	public ApiResponse insertValues(TableProperties tableProperties)
@@ -134,7 +164,6 @@ public class DataManager {
 					+ condition.getColumn() + " "
 					+ condition.getTypeCondition().getTypeInString() + " "
 					+ condition.getValue());
-			return ApiResponse.SUCCESS;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return ApiResponse.ERROR;
@@ -146,12 +175,14 @@ public class DataManager {
 					e.printStackTrace();
 				}
 		}
+		return ApiResponse.SUCCESS;
 	}
 
 	public TableData selectValues(TableProperties tableProperties, Condition condition)
 			throws IllegalArgumentException, LengthTableException {
 		Statement stat = null;
 		ResultSet rs = null;
+		Object[] values = null;
 		try {
 			if (connect == null || connect.isClosed())
 				return new TableData(ApiResponse.MYSQL_NOT_CONNECT, null);
@@ -162,7 +193,7 @@ public class DataManager {
 			if (tableProperties.getColumnName()[0].equals("*"))
 				throw new IllegalArgumentException(
 						"The * doesn't exist with MyApi.");
-			Object[] values = new Object[tableProperties.getColumnName().length];
+			values = new Object[tableProperties.getColumnName().length];
 			stat = connect.createStatement();
 			String columnString = createStringColumns(tableProperties
 					.getColumnName());
@@ -179,7 +210,6 @@ public class DataManager {
 				values[index] = rs.getObject(tableProperties.getColumnName()[index]);
 				index++;
 			}
-			return new TableData(ApiResponse.SUCCESS, values);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return new TableData(ApiResponse.ERROR, null);
@@ -198,6 +228,7 @@ public class DataManager {
 				}
 			}
 		}
+		return new TableData(ApiResponse.SUCCESS, values);
 	}
 
 	private String createStringValues(Object[] values) {

@@ -12,7 +12,7 @@ import ca.como89.myapi.api.mysql.exception.LengthTableException;
 /**
  * The MyApi library. (MySQL library)
  * @author como89
- * @version 1.0
+ * @version 1.1
  * @since August 17, 2014
  *
  */
@@ -60,13 +60,13 @@ public class MyApi {
 	/**
 	 * This method will create a Table with the name and the columns.
 	 * @param tableName - The name of the table.
-	 * @param colomns - The list of the Columns.
+	 * @param listcolumns - The list of the Columns.
 	 * @param existCondition - If you want to verify if the table exist.
 	 * @return ApiResponse, SUCCESS - if the operation success. ERROR, if a sql error happen. MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
 	 * @throws IllegalArgumentException - If the parameters are null.
 	 */
-	public ApiResponse createTable(String tableName,List<Columns> listcolomns, boolean existCondition) throws IllegalArgumentException{
-		return datamanager.createTable(tableName, listcolomns, existCondition);
+	public ApiResponse createTable(String tableName,List<Columns> listcolumns, boolean existCondition) throws IllegalArgumentException{
+		return datamanager.createTable(tableName, listcolumns, existCondition);
 	}
 	/**
 	 * This method will delete a Table with the name.
@@ -110,5 +110,16 @@ public class MyApi {
 	 */
 	public TableData selectValues(TableProperties tableProperties, Condition condition) throws IllegalArgumentException, LengthTableException{
 		return datamanager.selectValues(tableProperties,condition);
+	}
+	
+	/**
+	 * This method will delete values in the tableName and with the condition.
+	 * @param tableName - The table name.
+	 * @param condition - The condition object.
+	 * @return ApiResponse, SUCCESS - if the operation success. ERROR, if a sql error happen. MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * @throws IllegalArgumentException - If a parameter is null.
+	 */
+	public ApiResponse deleteValue(String tableName,Condition condition) throws IllegalArgumentException{
+		return datamanager.deleteValue(tableName, condition);
 	}
 }
