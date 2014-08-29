@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 import ca.como89.myapi.api.ApiResponse;
@@ -12,7 +13,6 @@ import ca.como89.myapi.api.TableData;
 import ca.como89.myapi.api.mysql.Columns;
 import ca.como89.myapi.api.mysql.Condition;
 import ca.como89.myapi.api.mysql.TableProperties;
-import ca.como89.myapi.api.mysql.TypeAlter;
 import ca.como89.myapi.api.mysql.exception.LengthTableException;
 
 public class DataManager {
@@ -39,12 +39,62 @@ public class DataManager {
 		}
 	}
 	
-	// TODO: Add alterTable.
-	public ApiResponse alterTable(String tableName,List<Columns> listColumns, TypeAlter type, boolean hisIgnore){
-		return null;
+	public ApiResponse addColumns(String tableName,List<Columns> listColumns, boolean hisIgnore) throws IllegalArgumentException{
+		Statement stat = null;
+		try{
+			if(connect == null && connect.isClosed())
+				return ApiResponse.MYSQL_NOT_CONNECT;
+			if(tableName == null || listColumns == null)
+				throw new IllegalArgumentException("An argument is null.");
+			stat = connect.createStatement();
+		String columnString = createColumns(listColumns);
+		stat.execute("ALTER " + (hisIgnore?"IGNORE ":"") + "TABLE " + tableName + " ADD COLUMN (" + columnString + ")");
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+			return ApiResponse.ERROR;
+		}
+		return ApiResponse.SUCCESS;
+	}
+	
+	public ApiResponse changeColumn(String tableName,String oldColumnName, Columns newColumn, boolean hisIgnore) throws IllegalArgumentException{
+		Statement stat = null;
+		try{
+			if(connect == null && connect.isClosed())
+				return ApiResponse.MYSQL_NOT_CONNECT;
+			if(tableName == null || newColumn == null)
+				throw new IllegalArgumentException("An argument is null.");
+			stat = connect.createStatement();
+			List<Columns> listColumns = new ArrayList<Columns>();
+			listColumns.add(newColumn);
+		String columnString = createColumns(listColumns);
+		stat.execute("ALTER " + (hisIgnore?"IGNORE ":"") + "TABLE " + tableName + " CHANGE COLUMN " + oldColumnName + " " + columnString);
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+			return ApiResponse.ERROR;
+		}
+		return ApiResponse.SUCCESS;
+	}
+	
+	public ApiResponse removeColumn(String tableName,String columnName,boolean hisIgnore) throws IllegalArgumentException{
+		Statement stat = null;
+		try{
+			if(connect == null && connect.isClosed())
+				return ApiResponse.MYSQL_NOT_CONNECT;
+			if(tableName == null || columnName == null)
+				throw new IllegalArgumentException("An argument is null.");
+			stat = connect.createStatement();
+			stat.execute("ALTER " + (hisIgnore?"IGNORE ":"") + "TABLE " + tableName + " DROP COLUMN " + columnName);
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+			return ApiResponse.ERROR;
+		}
+		return ApiResponse.SUCCESS;
 	}
 
-	public ApiResponse deleteValue(String tableName, Condition condition) throws IllegalArgumentException{
+	public ApiResponse deleteRow(String tableName, Condition condition) throws IllegalArgumentException{
 		Statement stat = null;
 		try {
 			if(connect == null && connect.isClosed())
@@ -52,7 +102,8 @@ public class DataManager {
 			if(tableName == null || condition == null)
 				throw new IllegalArgumentException("An argument is null.");
 			stat = connect.createStatement();
-			stat.execute("DELETE FROM " + tableName + " WHERE " + condition.getColumn() + " " + condition.getTypeCondition().getTypeInString() + " " + condition.getValue());
+			String conditionString = createStringCondition(condition);
+			stat.execute("DELETE FROM " + tableName + " WHERE " + conditionString);
 		}catch(SQLException e){
 			e.printStackTrace();
 			return ApiResponse.ERROR;
@@ -63,6 +114,7 @@ public class DataManager {
 					stat.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
+					return ApiResponse.ERROR;
 				}
 		}
 		return ApiResponse.SUCCESS;
@@ -90,6 +142,7 @@ public class DataManager {
 					stat.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
+					return ApiResponse.ERROR;
 				}
 		}
 		return ApiResponse.SUCCESS;
@@ -113,6 +166,7 @@ public class DataManager {
 					stat.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
+					return ApiResponse.ERROR;
 				}
 		}
 		return ApiResponse.SUCCESS;
@@ -140,6 +194,7 @@ public class DataManager {
 					stat.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
+					return ApiResponse.ERROR;
 				}
 			return ApiResponse.SUCCESS;
 	}
@@ -158,12 +213,11 @@ public class DataManager {
 				throw new LengthTableException(
 						"You put more than one column or value.");
 			stat = connect.createStatement();
+			String conditionString = createStringCondition(condition);
 			stat.execute("UPDATE " + tableProperties.getTableName() + " set "
 					+ tableProperties.getColumnName()[0] + " = '"
 					+ tableProperties.getValues()[0] + "' where "
-					+ condition.getColumn() + " "
-					+ condition.getTypeCondition().getTypeInString() + " "
-					+ condition.getValue());
+					+ conditionString);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return ApiResponse.ERROR;
@@ -173,6 +227,7 @@ public class DataManager {
 					stat.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
+					return ApiResponse.ERROR;
 				}
 		}
 		return ApiResponse.SUCCESS;
@@ -197,14 +252,12 @@ public class DataManager {
 			stat = connect.createStatement();
 			String columnString = createStringColumns(tableProperties
 					.getColumnName());
+			String conditionString = createStringCondition(condition);
 			rs = stat.executeQuery("SELECT "
 					+ columnString
 					+ " FROM "
 					+ tableProperties.getTableName()
-					+ (condition != null ? " where " + condition.getColumn()
-							+ " "
-							+ condition.getTypeCondition().getTypeInString()
-							+ " '" + condition.getValue() + "'" : ""));
+					+ (condition != null ? " where " + conditionString : ""));
 			int index = 0;
 			while(rs.next()){
 				values[index] = rs.getObject(tableProperties.getColumnName()[index]);
@@ -219,12 +272,14 @@ public class DataManager {
 					stat.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
+					return new TableData(ApiResponse.ERROR, null);
 				}
 			if(rs != null){
 				try {
 					rs.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
+					return new TableData(ApiResponse.ERROR, null);
 				}
 			}
 		}
@@ -247,10 +302,22 @@ public class DataManager {
 		}
 		return columnString;
 	}
+	
+	private String createStringCondition(Condition c){
+		String conditionString = "";
+		for(int i = 0; i < c.getColumns().length; i++){
+			conditionString += c.getColumns()[i] + " "
+					+ c.getTypes()[i].getTypeInString() 
+					+ " '" + c.getValues()[i] + "'" 
+					+ (i + 1 < c.getColumns().length ? (c.getChoices()[i]?" AND ":" OR ") : "");
+		}
+		return conditionString;
+	}
 
 	private String createColumns(List<Columns> listColomns) {
 		String colomnString = "";
 		String primaryKey = "";
+		String unique = "";
 		int index = 0;
 		for (Columns colomns : listColomns) {
 			colomnString += colomns.getColomnName();
@@ -263,8 +330,11 @@ public class DataManager {
 			if (colomns.isPrimaryKey()) {
 				primaryKey = "PRIMARY KEY (" + colomns.getColomnName() + ")";
 			}
+			else if(colomns.isUnique()){
+				unique = "UNIQUE (" + colomns.getColomnName() + ")";
+			}
 			colomnString += (index < listColomns.size() - 1 ? ", " : ","
-					+ primaryKey);
+					+ primaryKey + unique);
 			index++;
 		}
 		return colomnString;

@@ -13,7 +13,7 @@ import ca.como89.myapi.api.mysql.exception.LengthTableException;
  * The MyApi library. (MySQL library)
  * @author como89
  * @version 1.1
- * @since August 17, 2014
+ * @since August 28, 2014
  *
  */
 public class MyApi {
@@ -113,13 +113,49 @@ public class MyApi {
 	}
 	
 	/**
-	 * This method will delete values in the tableName and with the condition.
+	 * This method will delete rows in the tableName and with the condition.
 	 * @param tableName - The table name.
 	 * @param condition - The condition object.
 	 * @return ApiResponse, SUCCESS - if the operation success. ERROR, if a sql error happen. MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */
-	public ApiResponse deleteValue(String tableName,Condition condition) throws IllegalArgumentException{
-		return datamanager.deleteValue(tableName, condition);
+	public ApiResponse deleteRow(String tableName,Condition condition) throws IllegalArgumentException{
+		return datamanager.deleteRow(tableName, condition);
+	}
+	/**
+	 * This method will add columns in the tableName.
+	 * @param tableName - The table name.
+	 * @param listColumns - List of the columns.
+	 * @param hisIgnore - If true, do a copy of the table and restore data, after the modification.
+	 * @return ApiResponse, SUCCESS - if the operation success. ERROR, if a sql error happen. MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * @throws IllegalArgumentException - If a parameter is null.
+	 */
+	public ApiResponse addColumns(String tableName,List<Columns> listColumns, boolean hisIgnore) throws IllegalArgumentException{
+		return datamanager.addColumns(tableName, listColumns, hisIgnore);
+	}
+	
+	/**
+	 * This method will change the column in parameter.
+	 * @param tableName - The table name.
+	 * @param oldColumnName - The old column name.
+	 * @param newColumn - The new column.
+	 * @param hisIgnore - If true, do a copy of the table and restore data, after the modification.
+	 * @return ApiResponse, SUCCESS - if the operation success. ERROR, if a sql error happen. MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * @throws IllegalArgumentException - If a parameter is null.
+	 */
+	public ApiResponse changeColumn(String tableName, String oldColumnName, Columns newColumn, boolean hisIgnore) throws IllegalArgumentException{
+		return datamanager.changeColumn(tableName, oldColumnName, newColumn, hisIgnore);
+	}
+	
+	/**
+	 * This method will remove the column in parameter.
+	 * @param tableName - The table name.
+	 * @param columnName - The column name.
+	 * @param hisIgnore - If true, do a copy of the table and restore data, after the modification.
+	 * @return ApiResponse, SUCCESS - if the operation success. ERROR, if a sql error happen. MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * @throws IllegalArgumentException - If a parameter is null.
+	 */
+	public ApiResponse removeColumn(String tableName, String columnName, boolean hisIgnore) throws IllegalArgumentException{
+		return datamanager.removeColumn(tableName, columnName, hisIgnore);
 	}
 }
