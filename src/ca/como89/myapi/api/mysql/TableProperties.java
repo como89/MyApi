@@ -1,5 +1,6 @@
 package ca.como89.myapi.api.mysql;
 
+import ca.como89.myapi.DataManager;
 import ca.como89.myapi.api.mysql.exception.IllegalTypeException;
 
 public class TableProperties {
@@ -20,11 +21,7 @@ public class TableProperties {
 			throws IllegalTypeException, IllegalArgumentException {
 		if (tableName == null || columnNames == null)
 			throw new IllegalArgumentException("An argument is null.");
-			if (!(value[0] instanceof Integer) && !(value[0] instanceof Double)
-					&& !(value[0] instanceof String)
-					&& !(value[0] instanceof Character)
-					&& !(value[0] instanceof Float)
-					&& !(value[0] instanceof Boolean)) {
+			if(!DataManager.checkAllValues(value)) {
 				throw new IllegalTypeException(
 						"This type is not supported by MYApi. Types supported : Integer, Double, String, Character, Float and Boolean");
 		}

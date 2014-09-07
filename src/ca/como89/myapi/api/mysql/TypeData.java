@@ -6,8 +6,9 @@ package ca.como89.myapi.api.mysql;
 public enum TypeData {
 
 	INT("INT"),
-	DOUBLE("DOUBLE PRECISION"),
-	STRING("VARCHAR"),
+	DOUBLE("DOUBLE"),
+	VARCHAR("VARCHAR"),
+	TEXT("TEXT"),
 	CHAR("CHAR"),
 	FLOAT("FLOAT"),
 	BOOLEAN("BOOLEAN");

@@ -42,7 +42,7 @@ public class DataManager {
 	public ApiResponse addColumns(String tableName,List<Columns> listColumns, boolean hisIgnore) throws IllegalArgumentException{
 		Statement stat = null;
 		try{
-			if(connect == null && connect.isClosed())
+			if(connect == null || connect.isClosed())
 				return ApiResponse.MYSQL_NOT_CONNECT;
 			if(tableName == null || listColumns == null)
 				throw new IllegalArgumentException("An argument is null.");
@@ -60,7 +60,7 @@ public class DataManager {
 	public ApiResponse changeColumn(String tableName,String oldColumnName, Columns newColumn, boolean hisIgnore) throws IllegalArgumentException{
 		Statement stat = null;
 		try{
-			if(connect == null && connect.isClosed())
+			if(connect == null || connect.isClosed())
 				return ApiResponse.MYSQL_NOT_CONNECT;
 			if(tableName == null || newColumn == null)
 				throw new IllegalArgumentException("An argument is null.");
@@ -80,7 +80,7 @@ public class DataManager {
 	public ApiResponse removeColumn(String tableName,String columnName,boolean hisIgnore) throws IllegalArgumentException{
 		Statement stat = null;
 		try{
-			if(connect == null && connect.isClosed())
+			if(connect == null || connect.isClosed())
 				return ApiResponse.MYSQL_NOT_CONNECT;
 			if(tableName == null || columnName == null)
 				throw new IllegalArgumentException("An argument is null.");
@@ -97,7 +97,7 @@ public class DataManager {
 	public ApiResponse deleteRow(String tableName, Condition condition) throws IllegalArgumentException{
 		Statement stat = null;
 		try {
-			if(connect == null && connect.isClosed())
+			if(connect == null || connect.isClosed())
 				return ApiResponse.MYSQL_NOT_CONNECT;
 			if(tableName == null || condition == null)
 				throw new IllegalArgumentException("An argument is null.");
@@ -124,7 +124,7 @@ public class DataManager {
 			boolean existCondition) {
 		Statement stat = null;
 		try {
-			if (connect == null && connect.isClosed())
+			if (connect == null || connect.isClosed())
 				return ApiResponse.MYSQL_NOT_CONNECT;
 			if (tableName == null || listColumns == null)
 				throw new IllegalArgumentException("An argument is null.");
@@ -151,7 +151,7 @@ public class DataManager {
 	public ApiResponse deleteTable(String tableName) throws IllegalArgumentException{
 		Statement stat = null;
 		try {
-			if (connect == null && connect.isClosed())
+			if (connect == null || connect.isClosed())
 				return ApiResponse.MYSQL_NOT_CONNECT;
 			if (tableName == null)
 				throw new IllegalArgumentException("An argument is null.");
@@ -188,7 +188,7 @@ public class DataManager {
 					.getColumnName());
 			String valueString = createStringValues(tableProperties.getValues());
 			stat.execute("INSERT INTO " + tableProperties.getTableName() + " ("
-					+ columnString + ") VALUES " + "('" + valueString + "')");
+					+ columnString + ") VALUES " + "(" + valueString + ")");
 			if (stat != null)
 				try {
 					stat.close();
@@ -248,7 +248,6 @@ public class DataManager {
 			if (tableProperties.getColumnName()[0].equals("*"))
 				throw new IllegalArgumentException(
 						"The * doesn't exist with MyApi.");
-			values = new Object[tableProperties.getColumnName().length];
 			stat = connect.createStatement();
 			String columnString = createStringColumns(tableProperties
 					.getColumnName());
@@ -259,9 +258,14 @@ public class DataManager {
 					+ tableProperties.getTableName()
 					+ (condition != null ? " where " + conditionString : ""));
 			int index = 0;
+			rs.last();
+			values = new Object[rs.getRow() * tableProperties.getColumnName().length];
+			rs.beforeFirst();
 			while(rs.next()){
-				values[index] = rs.getObject(tableProperties.getColumnName()[index]);
+				for(String columnName : tableProperties.getColumnName()){
+				values[index] = rs.getObject(columnName);
 				index++;
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -285,11 +289,26 @@ public class DataManager {
 		}
 		return new TableData(ApiResponse.SUCCESS, values);
 	}
+	
+	public static boolean checkAllValues(Object[] values){
+		boolean correct = true;
+		for(Object value : values){
+			if(!(value instanceof Integer) && 
+					!(value instanceof Double) && 
+					!(value instanceof String) && 
+					!(value instanceof Character) && 
+					!(value instanceof Float) && 
+					!(value instanceof Boolean)){
+				correct = false;
+			}
+		}
+		return correct;
+	}
 
 	private String createStringValues(Object[] values) {
 		String valueString = "";
 		for (int i = 0; i < values.length; i++) {
-			valueString += values[i] + (i + 1 < values.length ? ", " : "");
+			valueString += "'" + values[i] + "'" + (i + 1 < values.length ? ", " : "");
 		}
 		return valueString;
 	}
@@ -323,18 +342,18 @@ public class DataManager {
 			colomnString += colomns.getColomnName();
 			colomnString += " " + colomns.getTypeData().getTypeInString();
 			colomnString += " ("
-					+ (colomns.getValue() != -1 ? colomns.getValue() : "0")
+					+ (colomns.getValue() != -1 ? colomns.getValue() : "10,2")
 					+ ")"
-					+ (colomns.isNull() ? " DEFAULT NULL " : " NOT NULL ")
-					+ (colomns.isAutoIncremented() ? "AUTO_INCREMENT" : "");
+					+ (colomns.isNull() ? " DEFAULT NULL " : " NOT NULL")
+					+ (colomns.isAutoIncremented() ? " AUTO_INCREMENT" : "");
 			if (colomns.isPrimaryKey()) {
-				primaryKey = "PRIMARY KEY (" + colomns.getColomnName() + ")";
+				primaryKey = " PRIMARY KEY (" + colomns.getColomnName() + ")";
 			}
 			else if(colomns.isUnique()){
-				unique = "UNIQUE (" + colomns.getColomnName() + ")";
+				unique = " UNIQUE (" + colomns.getColomnName() + ")";
 			}
-			colomnString += (index < listColomns.size() - 1 ? ", " : ","
-					+ primaryKey + unique);
+			colomnString += (index < listColomns.size() - 1 ? ", " : (!primaryKey.isEmpty() || !unique.isEmpty()?",":"")
+					+ primaryKey + (!unique.isEmpty() && !primaryKey.isEmpty()?",":"") +  unique);
 			index++;
 		}
 		return colomnString;

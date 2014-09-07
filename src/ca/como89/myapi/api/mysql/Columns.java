@@ -16,11 +16,11 @@ public class Columns {
 	 * @param typeData - The type of the data.
 	 * @param value - The length of the type or the value of the data.
 	 * @param isNull - If this column can be null.
-	 * @param primary - If this column is primary.
-	 * @param unique - If the values of this column are unique. 
+	 * @param primary - If this column is primary. 
 	 * @param autoIncremented - If this column can be autoIncremented.
+	 * @param unique - If the values of this column are unique.
 	 */
-	public Columns(String colomnName,TypeData typeData,int value,boolean isNull,boolean primary,boolean unique, boolean autoIncremented){
+	public Columns(String colomnName,TypeData typeData,int value,boolean isNull,boolean primary, boolean autoIncremented, boolean unique){
 		this.colomnName = colomnName;
 		this.typeData = typeData;
 		this.isNull = isNull;
