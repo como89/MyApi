@@ -342,7 +342,7 @@ public class DataManager {
 			colomnString += colomns.getColomnName();
 			colomnString += " " + colomns.getTypeData().getTypeInString();
 			colomnString += " ("
-					+ (colomns.getValue() != -1 ? colomns.getValue() : "10,2")
+					+ (colomns.getValue() != -1 ? colomns.getValue() : colomns.getDisplaySize() + "," + colomns.getDecimalNumber())
 					+ ")"
 					+ (colomns.isNull() ? " DEFAULT NULL " : " NOT NULL")
 					+ (colomns.isAutoIncremented() ? " AUTO_INCREMENT" : "");
