@@ -199,7 +199,7 @@ public class DataManager {
 			return ApiResponse.SUCCESS;
 	}
 
-	public ApiResponse updateValue(TableProperties tableProperties,
+	public ApiResponse updateValues(TableProperties tableProperties,
 			Condition condition) throws IllegalArgumentException,
 			LengthTableException {
 		Statement stat = null;
@@ -208,16 +208,17 @@ public class DataManager {
 				return ApiResponse.MYSQL_NOT_CONNECT;
 			if (tableProperties == null || condition == null)
 				throw new IllegalArgumentException("An argument is null.");
-			if (tableProperties.getColumnName().length != 1
-					|| tableProperties.getValues().length != 1)
+			if (tableProperties.getColumnName().length != tableProperties.getValues().length)
 				throw new LengthTableException(
-						"You put more than one column or value.");
+						"The tables are not equals.");
 			stat = connect.createStatement();
 			String conditionString = createStringCondition(condition);
-			stat.execute("UPDATE " + tableProperties.getTableName() + " set "
-					+ tableProperties.getColumnName()[0] + " = '"
-					+ tableProperties.getValues()[0] + "' where "
-					+ conditionString);
+			for(int i = 0; i < tableProperties.getColumnName().length;i++){
+				stat.execute("UPDATE " + tableProperties.getTableName() + " set "
+						+ tableProperties.getColumnName()[i] + " = '"
+						+ tableProperties.getValues()[i] + "' where "
+						+ conditionString);
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return ApiResponse.ERROR;
@@ -293,6 +294,8 @@ public class DataManager {
 	public static boolean checkAllValues(Object[] values){
 		boolean correct = true;
 		for(Object value : values){
+			if(value == null)
+				continue;
 			if(!(value instanceof Integer) && 
 					!(value instanceof Double) && 
 					!(value instanceof String) && 

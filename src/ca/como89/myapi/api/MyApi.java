@@ -90,15 +90,15 @@ public class MyApi {
 	}
 	
 	/**
-	 * This method will update value with what you have specified in the tableProperties and with the condition.
+	 * This method will update values with what you have specified in the tableProperties and with the condition.
 	 * @param  tableProperties - The tableProperties object.
 	 * @param  condition - The Condition object.
 	 * @return ApiResponse, SUCCESS - if the operation success. ERROR, if a sql error happen. MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
 	 * @throws LengthTableException - if the tables are not the same lenght.
 	 * @throws IllegalArgumentException - If the parameter is null.
 	 */
-	public ApiResponse updateValue(TableProperties tableProperties, Condition condition) throws IllegalArgumentException, LengthTableException{
-		return datamanager.updateValue(tableProperties, condition);
+	public ApiResponse updateValues(TableProperties tableProperties, Condition condition) throws IllegalArgumentException, LengthTableException{
+		return datamanager.updateValues(tableProperties, condition);
 	}
 	/**
 	 * This method will select values with what you have specified in the tableProperties and with the condition.
