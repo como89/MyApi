@@ -19,18 +19,28 @@ public class DataManager {
 
 	private Connection connect;
 	private Connexion connexion;
+	private String path;
 
 	public DataManager(String host, int port, String userName, String password,
 			String databaseName) {
 		this.connexion = new Connexion(host, port, userName, password,
 				databaseName);
 	}
+	
+	public DataManager(String path){
+		this.path = path;
+		this.connexion = null;
+	}
 
 	public void connect() throws ClassNotFoundException, SQLException {
 		Class.forName("com.mysql.jdbc.Driver");
+		if(connexion == null){
+			connect = DriverManager.getConnection("jdbc:sqlite:" + path);
+		} else {
 		connect = DriverManager.getConnection("jdbc:mysql://" + connexion.host
 				+ ":" + connexion.port + "/" + connexion.databaseName,
 				connexion.username, connexion.password);
+		}
 	}
 
 	public void disconnect() throws SQLException {

@@ -13,7 +13,7 @@ import ca.como89.myapi.api.mysql.exception.LengthTableException;
  * The MyApi library. (MySQL library)
  * @author como89
  * @version 1.1
- * @since August 28, 2014
+ * @since October 7, 2014
  *
  */
 public class MyApi {
@@ -41,7 +41,15 @@ public class MyApi {
 		}
 	}
 	/**
-	 * This method will connect the library with the mysql server.
+	 * This method will initialize the SQLite connection.
+	 * @param path - The path with the file name and his extension.
+	 */
+	public void init(String path){
+		if(datamanager == null)
+			datamanager = new DataManager(path);
+	}
+	/**
+	 * This method will connect the library with the mysql server or SQLite file.
 	 * @throws ClassNotFoundException - When not found the class of jdbc.
 	 * @throws SQLException - SQL problems, connection not found.
 	 */
@@ -50,7 +58,7 @@ public class MyApi {
 	}
 	
 	/**
-	 * This method will disconnect the library with the mysql server.
+	 * This method will disconnect the library with the mysql server or SQLite file.
 	 * @throws SQLException - SQL problems, connection not found.
 	 */
 	public void disconnect() throws SQLException{
