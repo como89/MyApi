@@ -6,7 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import ca.como89.myapi.api.ApiResponse;
 import ca.como89.myapi.api.TableData;
@@ -19,28 +21,18 @@ public class DataManager {
 
 	private Connection connect;
 	private Connexion connexion;
-	private String path;
 
 	public DataManager(String host, int port, String userName, String password,
 			String databaseName) {
 		this.connexion = new Connexion(host, port, userName, password,
 				databaseName);
 	}
-	
-	public DataManager(String path){
-		this.path = path;
-		this.connexion = null;
-	}
 
 	public void connect() throws ClassNotFoundException, SQLException {
 		Class.forName("com.mysql.jdbc.Driver");
-		if(connexion == null){
-			connect = DriverManager.getConnection("jdbc:sqlite:" + path);
-		} else {
 		connect = DriverManager.getConnection("jdbc:mysql://" + connexion.host
 				+ ":" + connexion.port + "/" + connexion.databaseName,
 				connexion.username, connexion.password);
-		}
 	}
 
 	public void disconnect() throws SQLException {
@@ -53,16 +45,25 @@ public class DataManager {
 		Statement stat = null;
 		try{
 			if(connect == null || connect.isClosed())
-				return ApiResponse.MYSQL_NOT_CONNECT;
+				return ApiResponse.DATABASE_NOT_CONNECT;
 			if(tableName == null || listColumns == null)
 				throw new IllegalArgumentException("An argument is null.");
 			stat = connect.createStatement();
-		String columnString = createColumns(listColumns);
-		stat.execute("ALTER " + (hisIgnore?"IGNORE ":"") + "TABLE " + tableName + " ADD COLUMN (" + columnString + ")");
+			String columnString = createColumns(listColumns);
+			stat.execute("ALTER " + (hisIgnore?"IGNORE ":"") + "TABLE " + tableName + " ADD COLUMN (" + columnString + ")");
 		}
 		catch(SQLException e){
 			e.printStackTrace();
 			return ApiResponse.ERROR;
+		}
+		finally {
+			if (stat != null)
+				try {
+					stat.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+					return ApiResponse.ERROR;
+				}
 		}
 		return ApiResponse.SUCCESS;
 	}
@@ -71,7 +72,7 @@ public class DataManager {
 		Statement stat = null;
 		try{
 			if(connect == null || connect.isClosed())
-				return ApiResponse.MYSQL_NOT_CONNECT;
+				return ApiResponse.DATABASE_NOT_CONNECT;
 			if(tableName == null || newColumn == null)
 				throw new IllegalArgumentException("An argument is null.");
 			stat = connect.createStatement();
@@ -84,6 +85,15 @@ public class DataManager {
 			e.printStackTrace();
 			return ApiResponse.ERROR;
 		}
+		finally {
+			if (stat != null)
+				try {
+					stat.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+					return ApiResponse.ERROR;
+				}
+		}
 		return ApiResponse.SUCCESS;
 	}
 	
@@ -91,7 +101,7 @@ public class DataManager {
 		Statement stat = null;
 		try{
 			if(connect == null || connect.isClosed())
-				return ApiResponse.MYSQL_NOT_CONNECT;
+				return ApiResponse.DATABASE_NOT_CONNECT;
 			if(tableName == null || columnName == null)
 				throw new IllegalArgumentException("An argument is null.");
 			stat = connect.createStatement();
@@ -101,14 +111,74 @@ public class DataManager {
 			e.printStackTrace();
 			return ApiResponse.ERROR;
 		}
+		finally {
+			if (stat != null)
+				try {
+					stat.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+					return ApiResponse.ERROR;
+				}
+		}
 		return ApiResponse.SUCCESS;
+	}
+	
+	public TableData countRows(TableProperties tableProperties, Condition condition) throws IllegalArgumentException, LengthTableException{
+		Statement stat = null;
+		ResultSet rs = null;
+		Map<String,Object> mapValue = null;
+		try {
+			if(connect == null || connect.isClosed())
+				return new TableData(ApiResponse.DATABASE_NOT_CONNECT,null);
+			if(tableProperties == null || condition == null)
+				throw new IllegalArgumentException("An argument is null.");
+			if (tableProperties.getColumnName().length < 1)
+				throw new LengthTableException("You need some colomns.");
+			if (tableProperties.getColumnName()[0].equals("*"))
+				throw new IllegalArgumentException(
+						"The * doesn't exist with MyApi.");
+			stat = connect.createStatement();
+			String columnString = createStringColumns(tableProperties
+					.getColumnName());
+			String conditionString = createStringCondition(condition);
+			rs = stat.executeQuery("SELECT " + columnString 
+					+ ", COUNT(*) FROM " + tableProperties.getTableName() 
+					+ " WHERE " + conditionString);
+			mapValue = new HashMap<String,Object>();
+			while(rs.next()){
+				for(String columnName : tableProperties.getColumnName()){
+				mapValue.put(columnName, rs.getObject(columnName));
+				}
+			}
+		}catch(SQLException e){
+			e.printStackTrace();
+			return new TableData(ApiResponse.ERROR,null);
+		}
+		finally {
+			if (stat != null)
+				try {
+					stat.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+					return new TableData(ApiResponse.ERROR, null);
+				}
+			if(rs != null){
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+					return new TableData(ApiResponse.ERROR, null);
+				}
+			}
+		}
+		return new TableData(ApiResponse.SUCCESS,mapValue);
 	}
 
 	public ApiResponse deleteRow(String tableName, Condition condition) throws IllegalArgumentException{
 		Statement stat = null;
 		try {
 			if(connect == null || connect.isClosed())
-				return ApiResponse.MYSQL_NOT_CONNECT;
+				return ApiResponse.DATABASE_NOT_CONNECT;
 			if(tableName == null || condition == null)
 				throw new IllegalArgumentException("An argument is null.");
 			stat = connect.createStatement();
@@ -135,7 +205,7 @@ public class DataManager {
 		Statement stat = null;
 		try {
 			if (connect == null || connect.isClosed())
-				return ApiResponse.MYSQL_NOT_CONNECT;
+				return ApiResponse.DATABASE_NOT_CONNECT;
 			if (tableName == null || listColumns == null)
 				throw new IllegalArgumentException("An argument is null.");
 			stat = connect.createStatement();
@@ -162,7 +232,7 @@ public class DataManager {
 		Statement stat = null;
 		try {
 			if (connect == null || connect.isClosed())
-				return ApiResponse.MYSQL_NOT_CONNECT;
+				return ApiResponse.DATABASE_NOT_CONNECT;
 			if (tableName == null)
 				throw new IllegalArgumentException("An argument is null.");
 			stat = connect.createStatement();
@@ -186,7 +256,7 @@ public class DataManager {
 			throws IllegalArgumentException, LengthTableException, SQLException {
 		Statement stat = null;
 			if (connect == null || connect.isClosed())
-				return ApiResponse.MYSQL_NOT_CONNECT;
+				return ApiResponse.DATABASE_NOT_CONNECT;
 			if (tableProperties == null)
 				throw new IllegalArgumentException("The argument is null.");
 			if (tableProperties.getColumnName().length != tableProperties
@@ -215,7 +285,7 @@ public class DataManager {
 		Statement stat = null;
 		try {
 			if (connect == null || connect.isClosed())
-				return ApiResponse.MYSQL_NOT_CONNECT;
+				return ApiResponse.DATABASE_NOT_CONNECT;
 			if (tableProperties == null || condition == null)
 				throw new IllegalArgumentException("An argument is null.");
 			if (tableProperties.getColumnName().length != tableProperties.getValues().length)
@@ -248,10 +318,10 @@ public class DataManager {
 			throws IllegalArgumentException, LengthTableException {
 		Statement stat = null;
 		ResultSet rs = null;
-		Object[] values = null;
+		Map<String,Object> mapValue = null;
 		try {
 			if (connect == null || connect.isClosed())
-				return new TableData(ApiResponse.MYSQL_NOT_CONNECT, null);
+				return new TableData(ApiResponse.DATABASE_NOT_CONNECT, null);
 			if (tableProperties == null)
 				throw new IllegalArgumentException("An argument is null.");
 			if (tableProperties.getColumnName().length < 1)
@@ -268,14 +338,10 @@ public class DataManager {
 					+ " FROM "
 					+ tableProperties.getTableName()
 					+ (condition != null ? " where " + conditionString : ""));
-			int index = 0;
-			rs.last();
-			values = new Object[rs.getRow() * tableProperties.getColumnName().length];
-			rs.beforeFirst();
+			mapValue = new HashMap<String,Object>();
 			while(rs.next()){
 				for(String columnName : tableProperties.getColumnName()){
-				values[index] = rs.getObject(columnName);
-				index++;
+				mapValue.put(columnName, rs.getObject(columnName));
 				}
 			}
 		} catch (SQLException e) {
@@ -298,7 +364,7 @@ public class DataManager {
 				}
 			}
 		}
-		return new TableData(ApiResponse.SUCCESS, values);
+		return new TableData(ApiResponse.SUCCESS, mapValue);
 	}
 	
 	public static boolean checkAllValues(Object[] values){

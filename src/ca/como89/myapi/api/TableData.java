@@ -1,22 +1,24 @@
 package ca.como89.myapi.api;
 
+import java.util.Map;
+
 
 public class TableData {
 
 	private ApiResponse response;
-	private Object[] value;
+	private Map<String,Object> mapValue;
 	
-	public TableData(ApiResponse response, Object [] value){
+	public TableData(ApiResponse response, Map<String,Object> mapValue){
 		this.response = response;
-		this.value = value;
+		this.mapValue = mapValue;
 	}
 	
 	/**
-	 * This method will return the values that you want.
-	 * @return Object[] - return a table of Object.
+	 * This method will return the values that you want in MapList.
+	 * @return Map<String,Object> - the MapList.
 	 */
-	public Object[] getValues(){
-		return value;
+	public Map<String,Object> getMapValue(){
+		return mapValue;
 	}
 	
 	/**

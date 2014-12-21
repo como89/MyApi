@@ -12,7 +12,7 @@ import ca.como89.myapi.api.mysql.exception.LengthTableException;
 /**
  * The MyApi library. (MySQL library)
  * @author como89
- * @version 1.1
+ * @version 1.2
  * @since October 7, 2014
  *
  */
@@ -41,15 +41,7 @@ public class MyApi {
 		}
 	}
 	/**
-	 * This method will initialize the SQLite connection.
-	 * @param path - The path with the file name and his extension.
-	 */
-	public void init(String path){
-		if(datamanager == null)
-			datamanager = new DataManager(path);
-	}
-	/**
-	 * This method will connect the library with the mysql server or SQLite file.
+	 * This method will connect the library with the mysql server.
 	 * @throws ClassNotFoundException - When not found the class of jdbc.
 	 * @throws SQLException - SQL problems, connection not found.
 	 */
@@ -58,7 +50,7 @@ public class MyApi {
 	}
 	
 	/**
-	 * This method will disconnect the library with the mysql server or SQLite file.
+	 * This method will disconnect the library with the mysql server.
 	 * @throws SQLException - SQL problems, connection not found.
 	 */
 	public void disconnect() throws SQLException{
@@ -118,6 +110,18 @@ public class MyApi {
 	 */
 	public TableData selectValues(TableProperties tableProperties, Condition condition) throws IllegalArgumentException, LengthTableException{
 		return datamanager.selectValues(tableProperties,condition);
+	}
+	
+	/**
+	 * This method will count rows with what you have specified in the tableProperties and with the condition.
+	 * @param tableProperties - The TableProperties object.
+	 * @param condition -The condition object.
+	 * @return TableData - You can get values and get response from the api.
+	 * @throws IllegalArgumentException - If the parameter is null.
+	 * @throws LengthTableException - if the tables are not the same lenght.
+	 */
+	public TableData countRows(TableProperties tableProperties, Condition condition) throws IllegalArgumentException, LengthTableException{
+		return datamanager.countRows(tableProperties, condition);
 	}
 	
 	/**
