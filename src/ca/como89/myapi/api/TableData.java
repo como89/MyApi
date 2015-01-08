@@ -7,10 +7,16 @@ public class TableData {
 
 	private ApiResponse response;
 	private Map<String,Object> mapValue;
+	private boolean result;
 	
 	public TableData(ApiResponse response, Map<String,Object> mapValue){
 		this.response = response;
 		this.mapValue = mapValue;
+	}
+	
+	public TableData(ApiResponse response, boolean result){
+		this.response = response;
+		this.result = result;
 	}
 	
 	/**
@@ -19,6 +25,13 @@ public class TableData {
 	 */
 	public Map<String,Object> getMapValue(){
 		return mapValue;
+	}
+	/**
+	 * This method will return true, if the method have result.
+	 * @return true when have result and false when do not have result.
+	 */
+	public boolean hasResult(){
+		return result;
 	}
 	
 	/**

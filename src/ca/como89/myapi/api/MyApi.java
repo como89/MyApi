@@ -178,4 +178,25 @@ public class MyApi {
 	public ApiResponse removeColumn(String tableName, String columnName, boolean hisIgnore) throws IllegalArgumentException{
 		return datamanager.removeColumn(tableName, columnName, hisIgnore);
 	}
+	
+	/**
+	 * This method will check if the table exist in parameter.
+	 * @param tableName - The table name.
+	 * @return TableData - You can get the result and get response from the api.
+	 * @throws IllegalArgumentException - If a parameter is null.
+	 */
+	public TableData checkIfTableExist(String tableName) throws IllegalArgumentException{
+		return datamanager.checkIfTableExist(tableName);
+	}
+	
+	/**
+	 * This method will check if the column exist in parameter.
+	 * @param tableName - The table name.
+	 * @param columnName - The column name.
+	 * @return TableData - You can get the result and get response from the api.
+	 * @throws IllegalArgumentException - If a parameter is null.
+	 */
+	public TableData checkIfColumnExist(String tableName, String columnName) throws IllegalArgumentException{
+		return datamanager.checkIfColumnExist(tableName, columnName);
+	}
 }

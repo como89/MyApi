@@ -1,6 +1,7 @@
 package ca.como89.myapi;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,6 +22,7 @@ public class DataManager {
 
 	private Connection connect;
 	private Connexion connexion;
+	private String path;
 
 	public DataManager(String host, int port, String userName, String password,
 			String databaseName) {
@@ -47,6 +49,40 @@ public class DataManager {
 	public void disconnect() throws SQLException {
 		if (connect != null) {
 			connect.close();
+		}
+	}
+	
+	public TableData checkIfTableExist(String tableName) throws IllegalArgumentException{
+		DatabaseMetaData databaseMeta = null;
+		try {
+			if(connect == null || connect.isClosed())
+				return new TableData(ApiResponse.DATABASE_NOT_CONNECT,false);
+		if(tableName == null)
+			throw new IllegalArgumentException("An argument is null.");
+		databaseMeta = connect.getMetaData();
+		ResultSet rs = null;
+		rs = databaseMeta.getTables(null, null, tableName, null);
+		return (rs.next()?new TableData(ApiResponse.SUCCESS,true):new TableData(ApiResponse.SUCCESS,false));
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return new TableData(ApiResponse.ERROR,false);
+		}
+	}
+	
+	public TableData checkIfColumnExist(String tableName, String columnName) throws IllegalArgumentException{
+		DatabaseMetaData databaseMeta = null;
+		try {
+			if(connect == null || connect.isClosed())
+				return new TableData(ApiResponse.DATABASE_NOT_CONNECT,false);
+		if(tableName == null || columnName == null)
+			throw new IllegalArgumentException("An argument is null.");
+		databaseMeta = connect.getMetaData();
+		ResultSet rs = null;
+		rs = databaseMeta.getColumns(null, null, tableName, columnName);
+		return (rs.next()?new TableData(ApiResponse.SUCCESS,true):new TableData(ApiResponse.SUCCESS,false));
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return new TableData(ApiResponse.ERROR,false);
 		}
 	}
 	
