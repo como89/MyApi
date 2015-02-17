@@ -13,5 +13,9 @@ public enum ApiResponse {
 	/**
 	 * DATABASE_NOT_CONNECT, if the method cannot be use, because the library is not connected to mysql server / SQL file.
 	 */
-	DATABASE_NOT_CONNECT;
+	DATABASE_NOT_CONNECT,
+	/**
+	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
+	 */
+	MYAPI_NOT_INITIALISE;
 }

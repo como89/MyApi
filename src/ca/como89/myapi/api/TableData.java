@@ -6,12 +6,13 @@ import java.util.Map;
 public class TableData {
 
 	private ApiResponse response;
-	private Map<String,Object> mapValue;
+	private Map<Integer,Object> mapValues;
 	private boolean result;
 	
-	public TableData(ApiResponse response, Map<String,Object> mapValue){
+	public TableData(ApiResponse response, Map<Integer,Object> mapValues){
 		this.response = response;
-		this.mapValue = mapValue;
+		this.mapValues = mapValues;
+		this.result = false;
 	}
 	
 	public TableData(ApiResponse response, boolean result){
@@ -20,11 +21,11 @@ public class TableData {
 	}
 	
 	/**
-	 * This method will return the values that you want in MapList.
-	 * @return Map<String,Object> - the MapList.
+	 * This method return a map values from the select request.
+	 * @return a Map<Integer,Object>
 	 */
-	public Map<String,Object> getMapValue(){
-		return mapValue;
+	public Map<Integer,Object> getMapValue(){
+		return mapValues;
 	}
 	/**
 	 * This method will return true, if the method have result.

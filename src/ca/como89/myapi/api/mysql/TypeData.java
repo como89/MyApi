@@ -11,6 +11,7 @@ public enum TypeData {
 	TEXT("TEXT"),
 	CHAR("CHAR"),
 	FLOAT("FLOAT"),
+	LONG("SIGNED BIGINT"),
 	BOOLEAN("BOOLEAN");
 	
 	private String type;

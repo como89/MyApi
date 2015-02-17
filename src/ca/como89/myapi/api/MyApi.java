@@ -50,19 +50,35 @@ public class MyApi {
 	}
 	/**
 	 * This method will connect the library with the mysql server or SQLite file.
+	 * @return ApiResponse, 
+	 * SUCCESS - if the operation success. 
+	 * ERROR, if a sql error happen. 
+	 * MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
 	 * @throws ClassNotFoundException - When not found the class of jdbc.
 	 * @throws SQLException - SQL problems, connection not found.
 	 */
-	public void connect() throws ClassNotFoundException, SQLException{
+	public ApiResponse connect() throws ClassNotFoundException, SQLException{
+		if(datamanager == null)
+			return ApiResponse.MYAPI_NOT_INITIALISE;
 		datamanager.connect();
+		return ApiResponse.SUCCESS;
 	}
 	
 	/**
 	 * This method will disconnect the library with the mysql server or SQLite file.
+	 * @return ApiResponse, 
+	 * SUCCESS - if the operation success. 
+	 * ERROR, if a sql error happen. 
+	 * MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
 	 * @throws SQLException - SQL problems, connection not found.
 	 */
-	public void disconnect() throws SQLException{
+	public ApiResponse disconnect() throws SQLException{
+		if(datamanager == null)
+			return ApiResponse.MYAPI_NOT_INITIALISE;
 		datamanager.disconnect();
+		return ApiResponse.SUCCESS;
 	}
 	
 	/**
@@ -70,43 +86,59 @@ public class MyApi {
 	 * @param tableName - The name of the table.
 	 * @param listcolumns - The list of the Columns.
 	 * @param existCondition - If you want to verify if the table exist.
-	 * @return ApiResponse, SUCCESS - if the operation success. ERROR, if a sql error happen. MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * @return ApiResponse, 
+	 * SUCCESS - if the operation success. 
+	 * ERROR, if a sql error happen. 
+	 * MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
 	 * @throws IllegalArgumentException - If the parameters are null.
 	 */
 	public ApiResponse createTable(String tableName,List<Columns> listcolumns, boolean existCondition) throws IllegalArgumentException{
-		return datamanager.createTable(tableName, listcolumns, existCondition);
+		return datamanager == null?ApiResponse.MYAPI_NOT_INITIALISE:datamanager.createTable(tableName, listcolumns, existCondition);
 	}
 	/**
 	 * This method will delete a Table with the name.
 	 * @param tableName - The name of the table.
-	 * @return ApiResponse, SUCCESS - if the operation success. ERROR, if a sql error happen. MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * @return ApiResponse, 
+	 * SUCCESS - if the operation success. 
+	 * ERROR, if a sql error happen. 
+	 * MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
 	 * @throws IllegalArgumentException - If the parameter is null.
 	 */
 	public ApiResponse deleteTable(String tableName) throws IllegalArgumentException{
-		return datamanager.deleteTable(tableName);
+		return datamanager == null?ApiResponse.MYAPI_NOT_INITIALISE:datamanager.deleteTable(tableName);
 	}
 	/**
 	 * This method will insert values with what you have specified in the tableProperties.
 	 * @param tableProperties - The TableProperties object.
-	 * @return ApiResponse, SUCCESS - if the operation success. ERROR, if a sql error happen. MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * @return ApiResponse, 
+	 * SUCCESS - if the operation success. 
+	 * ERROR, if a sql error happen. 
+	 * MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
 	 * @throws IllegalArgumentException - If the parameter is null.
 	 * @throws LengthTableException - if the tables are not the same lenght.
 	 * @throws SQLException - SQL problems, connection not found.
 	 */
 	public ApiResponse insertValues(TableProperties tableProperties) throws IllegalArgumentException, LengthTableException, SQLException{
-		return datamanager.insertValues(tableProperties);
+		return datamanager == null?ApiResponse.MYAPI_NOT_INITIALISE:datamanager.insertValues(tableProperties);
 	}
 	
 	/**
 	 * This method will update values with what you have specified in the tableProperties and with the condition.
 	 * @param  tableProperties - The tableProperties object.
 	 * @param  condition - The Condition object.
-	 * @return ApiResponse, SUCCESS - if the operation success. ERROR, if a sql error happen. MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * @return ApiResponse, 
+	 * SUCCESS - if the operation success. 
+	 * ERROR, if a sql error happen. 
+	 * MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
 	 * @throws LengthTableException - if the tables are not the same lenght.
 	 * @throws IllegalArgumentException - If the parameter is null.
 	 */
 	public ApiResponse updateValues(TableProperties tableProperties, Condition condition) throws IllegalArgumentException, LengthTableException{
-		return datamanager.updateValues(tableProperties, condition);
+		return datamanager == null?ApiResponse.MYAPI_NOT_INITIALISE:datamanager.updateValues(tableProperties, condition);
 	}
 	/**
 	 * This method will select values with what you have specified in the tableProperties and with the condition.
@@ -117,7 +149,7 @@ public class MyApi {
 	 * @throws LengthTableException - if the tables are not the same lenght.
 	 */
 	public TableData selectValues(TableProperties tableProperties, Condition condition) throws IllegalArgumentException, LengthTableException{
-		return datamanager.selectValues(tableProperties,condition);
+		return datamanager == null?new TableData(ApiResponse.MYAPI_NOT_INITIALISE,null):datamanager.selectValues(tableProperties,condition);
 	}
 	
 	/**
@@ -129,29 +161,37 @@ public class MyApi {
 	 * @throws LengthTableException - if the tables are not the same lenght.
 	 */
 	public TableData countRows(TableProperties tableProperties, Condition condition) throws IllegalArgumentException, LengthTableException{
-		return datamanager.countRows(tableProperties, condition);
+		return datamanager == null?new TableData(ApiResponse.MYAPI_NOT_INITIALISE,null):datamanager.countRows(tableProperties, condition);
 	}
 	
 	/**
 	 * This method will delete rows in the tableName and with the condition.
 	 * @param tableName - The table name.
 	 * @param condition - The condition object.
-	 * @return ApiResponse, SUCCESS - if the operation success. ERROR, if a sql error happen. MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * @return ApiResponse, 
+	 * SUCCESS - if the operation success. 
+	 * ERROR, if a sql error happen. 
+	 * MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */
 	public ApiResponse deleteRow(String tableName,Condition condition) throws IllegalArgumentException{
-		return datamanager.deleteRow(tableName, condition);
+		return datamanager == null?ApiResponse.MYAPI_NOT_INITIALISE:datamanager.deleteRow(tableName, condition);
 	}
 	/**
 	 * This method will add columns in the tableName.
 	 * @param tableName - The table name.
 	 * @param listColumns - List of the columns.
 	 * @param hisIgnore - If true, do a copy of the table and restore data, after the modification.
-	 * @return ApiResponse, SUCCESS - if the operation success. ERROR, if a sql error happen. MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * @return ApiResponse, 
+	 * SUCCESS - if the operation success. 
+	 * ERROR, if a sql error happen. 
+	 * MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */
 	public ApiResponse addColumns(String tableName,List<Columns> listColumns, boolean hisIgnore) throws IllegalArgumentException{
-		return datamanager.addColumns(tableName, listColumns, hisIgnore);
+		return datamanager == null?ApiResponse.MYAPI_NOT_INITIALISE:datamanager.addColumns(tableName, listColumns, hisIgnore);
 	}
 	
 	/**
@@ -160,11 +200,15 @@ public class MyApi {
 	 * @param oldColumnName - The old column name.
 	 * @param newColumn - The new column.
 	 * @param hisIgnore - If true, do a copy of the table and restore data, after the modification.
-	 * @return ApiResponse, SUCCESS - if the operation success. ERROR, if a sql error happen. MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * @return ApiResponse, 
+	 * SUCCESS - if the operation success. 
+	 * ERROR, if a sql error happen. 
+	 * MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */
 	public ApiResponse changeColumn(String tableName, String oldColumnName, Columns newColumn, boolean hisIgnore) throws IllegalArgumentException{
-		return datamanager.changeColumn(tableName, oldColumnName, newColumn, hisIgnore);
+		return datamanager == null?ApiResponse.MYAPI_NOT_INITIALISE:datamanager.changeColumn(tableName, oldColumnName, newColumn, hisIgnore);
 	}
 	
 	/**
@@ -172,11 +216,15 @@ public class MyApi {
 	 * @param tableName - The table name.
 	 * @param columnName - The column name.
 	 * @param hisIgnore - If true, do a copy of the table and restore data, after the modification.
-	 * @return ApiResponse, SUCCESS - if the operation success. ERROR, if a sql error happen. MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * @return ApiResponse, 
+	 * SUCCESS - if the operation success. 
+	 * ERROR, if a sql error happen. 
+	 * MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */
 	public ApiResponse removeColumn(String tableName, String columnName, boolean hisIgnore) throws IllegalArgumentException{
-		return datamanager.removeColumn(tableName, columnName, hisIgnore);
+		return datamanager == null?ApiResponse.MYAPI_NOT_INITIALISE:datamanager.removeColumn(tableName, columnName, hisIgnore);
 	}
 	
 	/**
@@ -186,7 +234,7 @@ public class MyApi {
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */
 	public TableData checkIfTableExist(String tableName) throws IllegalArgumentException{
-		return datamanager.checkIfTableExist(tableName);
+		return datamanager == null?new TableData(ApiResponse.MYAPI_NOT_INITIALISE,null):datamanager.checkIfTableExist(tableName);
 	}
 	
 	/**
@@ -197,6 +245,6 @@ public class MyApi {
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */
 	public TableData checkIfColumnExist(String tableName, String columnName) throws IllegalArgumentException{
-		return datamanager.checkIfColumnExist(tableName, columnName);
+		return datamanager == null?new TableData(ApiResponse.MYAPI_NOT_INITIALISE,null):datamanager.checkIfColumnExist(tableName, columnName);
 	}
 }

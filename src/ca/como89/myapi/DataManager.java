@@ -171,7 +171,7 @@ public class DataManager {
 	public TableData countRows(TableProperties tableProperties, Condition condition) throws IllegalArgumentException, LengthTableException{
 		Statement stat = null;
 		ResultSet rs = null;
-		Map<String,Object> mapValue = null;
+		Map<Integer,Object> mapValue = null;
 		try {
 			if(connect == null || connect.isClosed())
 				return new TableData(ApiResponse.DATABASE_NOT_CONNECT,null);
@@ -189,10 +189,12 @@ public class DataManager {
 			rs = stat.executeQuery("SELECT " + columnString 
 					+ ", COUNT(*) FROM " + tableProperties.getTableName() 
 					+ " WHERE " + conditionString);
-			mapValue = new HashMap<String,Object>();
+			mapValue = new HashMap<Integer,Object>();
+			int index = 0;
 			while(rs.next()){
 				for(String columnName : tableProperties.getColumnName()){
-				mapValue.put(columnName, rs.getObject(columnName));
+				mapValue.put(index, rs.getObject(columnName));
+				index++;
 				}
 			}
 		}catch(SQLException e){
@@ -363,7 +365,7 @@ public class DataManager {
 			throws IllegalArgumentException, LengthTableException {
 		Statement stat = null;
 		ResultSet rs = null;
-		Map<String,Object> mapValue = null;
+		Map<Integer,Object> mapValue = null;
 		try {
 			if (connect == null || connect.isClosed())
 				return new TableData(ApiResponse.DATABASE_NOT_CONNECT, null);
@@ -383,10 +385,12 @@ public class DataManager {
 					+ " FROM "
 					+ tableProperties.getTableName()
 					+ (condition != null ? " where " + conditionString : ""));
-			mapValue = new HashMap<String,Object>();
+			mapValue = new HashMap<Integer,Object>();
+			int index = 0;
 			while(rs.next()){
 				for(String columnName : tableProperties.getColumnName()){
-				mapValue.put(columnName, rs.getObject(columnName));
+				mapValue.put(index, rs.getObject(columnName));
+				index++;
 				}
 			}
 		} catch (SQLException e) {
