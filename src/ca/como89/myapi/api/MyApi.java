@@ -10,7 +10,7 @@ import ca.como89.myapi.api.mysql.TableProperties;
 import ca.como89.myapi.api.mysql.exception.LengthTableException;
 
 /**
- * The MyApi library. (MySQL library)
+ * The MyApi library. (MySQL and SQLite library)
  * @author como89
  * @version 1.2
  * @since January 7, 2015
@@ -19,12 +19,14 @@ import ca.como89.myapi.api.mysql.exception.LengthTableException;
 public class MyApi {
 
 	private DataManager datamanager;
+	private boolean sqlite;
 	
 	/**
 	 * The constructor to initialize the API.
 	 */
 	public MyApi(){
 		datamanager = null;
+		sqlite = false;
 	}
 	
 	/**
@@ -46,6 +48,7 @@ public class MyApi {
 	 */
 	public void init(String path){
 		if(datamanager == null)
+			sqlite = true;
 			datamanager = new DataManager(path);
 	}
 	/**
@@ -94,7 +97,12 @@ public class MyApi {
 	 * @throws IllegalArgumentException - If the parameters are null.
 	 */
 	public ApiResponse createTable(String tableName,List<Columns> listcolumns, boolean existCondition) throws IllegalArgumentException{
-		return datamanager == null?ApiResponse.MYAPI_NOT_INITIALISE:datamanager.createTable(tableName, listcolumns, existCondition);
+		if(datamanager == null)
+			return ApiResponse.MYAPI_NOT_INITIALISE;
+		if(sqlite){
+			return datamanager.createTableSqLite(tableName, listcolumns, existCondition);
+		}
+		return datamanager.createTable(tableName, listcolumns, existCondition);
 	}
 	/**
 	 * This method will delete a Table with the name.
@@ -107,7 +115,9 @@ public class MyApi {
 	 * @throws IllegalArgumentException - If the parameter is null.
 	 */
 	public ApiResponse deleteTable(String tableName) throws IllegalArgumentException{
-		return datamanager == null?ApiResponse.MYAPI_NOT_INITIALISE:datamanager.deleteTable(tableName);
+		if(datamanager == null)
+			return ApiResponse.MYAPI_NOT_INITIALISE;
+		return datamanager.deleteTable(tableName);
 	}
 	/**
 	 * This method will insert values with what you have specified in the tableProperties.
@@ -122,7 +132,9 @@ public class MyApi {
 	 * @throws SQLException - SQL problems, connection not found.
 	 */
 	public ApiResponse insertValues(TableProperties tableProperties) throws IllegalArgumentException, LengthTableException, SQLException{
-		return datamanager == null?ApiResponse.MYAPI_NOT_INITIALISE:datamanager.insertValues(tableProperties);
+		if(datamanager == null)
+			return ApiResponse.MYAPI_NOT_INITIALISE;
+		return datamanager.insertValues(tableProperties);
 	}
 	
 	/**
@@ -138,7 +150,9 @@ public class MyApi {
 	 * @throws IllegalArgumentException - If the parameter is null.
 	 */
 	public ApiResponse updateValues(TableProperties tableProperties, Condition condition) throws IllegalArgumentException, LengthTableException{
-		return datamanager == null?ApiResponse.MYAPI_NOT_INITIALISE:datamanager.updateValues(tableProperties, condition);
+		if(datamanager == null)
+			return ApiResponse.MYAPI_NOT_INITIALISE;
+		return datamanager.updateValues(tableProperties, condition);
 	}
 	/**
 	 * This method will select values with what you have specified in the tableProperties and with the condition.
@@ -149,7 +163,9 @@ public class MyApi {
 	 * @throws LengthTableException - if the tables are not the same lenght.
 	 */
 	public TableData selectValues(TableProperties tableProperties, Condition condition) throws IllegalArgumentException, LengthTableException{
-		return datamanager == null?new TableData(ApiResponse.MYAPI_NOT_INITIALISE,null):datamanager.selectValues(tableProperties,condition);
+		if(datamanager == null)
+			return new TableData(ApiResponse.MYAPI_NOT_INITIALISE,null);
+		return datamanager.selectValues(tableProperties,condition);
 	}
 	
 	/**
@@ -161,7 +177,9 @@ public class MyApi {
 	 * @throws LengthTableException - if the tables are not the same lenght.
 	 */
 	public TableData countRows(TableProperties tableProperties, Condition condition) throws IllegalArgumentException, LengthTableException{
-		return datamanager == null?new TableData(ApiResponse.MYAPI_NOT_INITIALISE,null):datamanager.countRows(tableProperties, condition);
+		if(datamanager == null)
+			return new TableData(ApiResponse.MYAPI_NOT_INITIALISE,null);
+		return datamanager.countRows(tableProperties, condition);
 	}
 	
 	/**
@@ -176,7 +194,9 @@ public class MyApi {
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */
 	public ApiResponse deleteRow(String tableName,Condition condition) throws IllegalArgumentException{
-		return datamanager == null?ApiResponse.MYAPI_NOT_INITIALISE:datamanager.deleteRow(tableName, condition);
+		if(datamanager == null)
+			return ApiResponse.MYAPI_NOT_INITIALISE;
+		return datamanager.deleteRow(tableName, condition);
 	}
 	/**
 	 * This method will add columns in the tableName.
@@ -191,7 +211,9 @@ public class MyApi {
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */
 	public ApiResponse addColumns(String tableName,List<Columns> listColumns, boolean hisIgnore) throws IllegalArgumentException{
-		return datamanager == null?ApiResponse.MYAPI_NOT_INITIALISE:datamanager.addColumns(tableName, listColumns, hisIgnore);
+		if(datamanager == null)
+			return ApiResponse.MYAPI_NOT_INITIALISE;
+		return datamanager.addColumns(tableName, listColumns, hisIgnore);
 	}
 	
 	/**
@@ -208,7 +230,9 @@ public class MyApi {
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */
 	public ApiResponse changeColumn(String tableName, String oldColumnName, Columns newColumn, boolean hisIgnore) throws IllegalArgumentException{
-		return datamanager == null?ApiResponse.MYAPI_NOT_INITIALISE:datamanager.changeColumn(tableName, oldColumnName, newColumn, hisIgnore);
+		if(datamanager == null)
+			return ApiResponse.MYAPI_NOT_INITIALISE;
+		return datamanager.changeColumn(tableName, oldColumnName, newColumn, hisIgnore);
 	}
 	
 	/**
@@ -224,7 +248,9 @@ public class MyApi {
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */
 	public ApiResponse removeColumn(String tableName, String columnName, boolean hisIgnore) throws IllegalArgumentException{
-		return datamanager == null?ApiResponse.MYAPI_NOT_INITIALISE:datamanager.removeColumn(tableName, columnName, hisIgnore);
+		if(datamanager == null)
+			return ApiResponse.MYAPI_NOT_INITIALISE;
+		return datamanager.removeColumn(tableName, columnName, hisIgnore);
 	}
 	
 	/**
@@ -234,7 +260,9 @@ public class MyApi {
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */
 	public TableData checkIfTableExist(String tableName) throws IllegalArgumentException{
-		return datamanager == null?new TableData(ApiResponse.MYAPI_NOT_INITIALISE,null):datamanager.checkIfTableExist(tableName);
+		if(datamanager == null)
+			return new TableData(ApiResponse.MYAPI_NOT_INITIALISE,null);
+		return datamanager.checkIfTableExist(tableName);
 	}
 	
 	/**
@@ -245,6 +273,8 @@ public class MyApi {
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */
 	public TableData checkIfColumnExist(String tableName, String columnName) throws IllegalArgumentException{
-		return datamanager == null?new TableData(ApiResponse.MYAPI_NOT_INITIALISE,null):datamanager.checkIfColumnExist(tableName, columnName);
+		if(datamanager == null)
+			return new TableData(ApiResponse.MYAPI_NOT_INITIALISE,null);
+		return datamanager.checkIfColumnExist(tableName, columnName);
 	}
 }

@@ -25,7 +25,7 @@ public class Condition {
 		if(columns == null || types == null || values == null || choice == null)throw new IllegalArgumentException("An argument is null.");
 		if(columns.length != types.length || columns.length != values.length || columns.length - 1 != choice.length) throw new LengthTableException("Values, columns, types and choice table aren't equals for the length.");
 		if(!DataManager.checkAllValues(values))
-			throw new IllegalTypeException("This type is not supported by MYApi. Types supported : Integer, Double, String, Character, Float and Boolean");
+			throw new IllegalTypeException("This type is not supported by MyApi. Types supported : Integer, Double, String, Character, Float, Boolean and Long");
 		this.columns = columns;
 		this.values = values;
 		this.types = types;
@@ -47,8 +47,9 @@ public class Condition {
 				!(value instanceof String) && 
 				!(value instanceof Character) && 
 				!(value instanceof Float) && 
-				!(value instanceof Boolean)) 
-			throw new IllegalTypeException("This type is not supported by MYApi. Types supported : Integer, Double, String, Character, Float and Boolean");
+				!(value instanceof Boolean) &&
+				!(value instanceof Long)) 
+			throw new IllegalTypeException("This type is not supported by MyApi. Types supported : Integer, Double, String, Character, Float, Boolean and Long");
 		this.columns = new String[]{column};
 		this.values = new Object[]{value};
 		this.types = new TypeCondition[]{type};

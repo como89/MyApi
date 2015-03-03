@@ -23,7 +23,7 @@ public class TableProperties {
 			throw new IllegalArgumentException("An argument is null.");
 			if(!DataManager.checkAllValues(value)) {
 				throw new IllegalTypeException(
-						"This type is not supported by MYApi. Types supported : Integer, Double, String, Character, Float and Boolean");
+						"This type is not supported by MyApi. Types supported : Integer, Double, String, Character, Float, Boolean and Long");
 		}
 		this.tableName = tableName;
 		this.columnName = columnNames;

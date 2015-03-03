@@ -5,7 +5,7 @@ package ca.como89.myapi.api.mysql;
  */
 public enum TypeData {
 
-	INT("INT"),
+	INT("INTEGER"),
 	DOUBLE("DOUBLE"),
 	VARCHAR("VARCHAR"),
 	TEXT("TEXT"),

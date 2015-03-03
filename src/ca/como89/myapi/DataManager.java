@@ -36,10 +36,11 @@ public class DataManager {
 	}
 
 	public void connect() throws ClassNotFoundException, SQLException {
-		Class.forName("com.mysql.jdbc.Driver");
 		if(connexion == null){
+			Class.forName("org.sqlite.JDBC");
 			connect = DriverManager.getConnection("jdbc:sqlite:" + path);
 		} else {
+			Class.forName("com.mysql.jdbc.Driver");
 		connect = DriverManager.getConnection("jdbc:mysql://" + connexion.host
 				+ ":" + connexion.port + "/" + connexion.databaseName,
 				connexion.username, connexion.password);
@@ -275,6 +276,34 @@ public class DataManager {
 		return ApiResponse.SUCCESS;
 	}
 	
+	public ApiResponse createTableSqLite(String tableName, List<Columns> listColumns,
+			boolean existCondition){
+		Statement stat = null;
+		try {
+			if (connect == null || connect.isClosed())
+				return ApiResponse.DATABASE_NOT_CONNECT;
+			if (tableName == null || listColumns == null)
+				throw new IllegalArgumentException("An argument is null.");
+			stat = connect.createStatement();
+			String columnString = createColumnsSqLite(listColumns);
+			stat.execute("CREATE TABLE "
+					+ (existCondition ? "IF NOT EXISTS " : "") + "" + tableName
+					+ " (" + columnString + ")");
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return ApiResponse.ERROR;
+		} finally {
+			if (stat != null)
+				try {
+					stat.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+					return ApiResponse.ERROR;
+				}
+		}
+		return ApiResponse.SUCCESS;
+	}
+
 	public ApiResponse deleteTable(String tableName) throws IllegalArgumentException{
 		Statement stat = null;
 		try {
@@ -426,7 +455,8 @@ public class DataManager {
 					!(value instanceof String) && 
 					!(value instanceof Character) && 
 					!(value instanceof Float) && 
-					!(value instanceof Boolean)){
+					!(value instanceof Boolean) && 
+					!(value instanceof Long)){
 				correct = false;
 			}
 		}
@@ -467,13 +497,13 @@ public class DataManager {
 		String unique = "";
 		int index = 0;
 		for (Columns colomns : listColomns) {
-			colomnString += colomns.getColomnName();
+			colomnString += "'" + colomns.getColomnName() + "'";
 			colomnString += " " + colomns.getTypeData().getTypeInString();
 			colomnString += " ("
 					+ (colomns.getValue() != -1 ? colomns.getValue() : colomns.getDisplaySize() + "," + colomns.getDecimalNumber())
 					+ ")"
 					+ (colomns.isNull() ? " DEFAULT NULL " : " NOT NULL")
-					+ (colomns.isAutoIncremented() ? " AUTO_INCREMENT" : "");
+					+ (colomns.isAutoIncremented()?" AUTO_INCREMENT" : "");
 			if (colomns.isPrimaryKey()) {
 				primaryKey = " PRIMARY KEY (" + colomns.getColomnName() + ")";
 			}
@@ -485,6 +515,24 @@ public class DataManager {
 			index++;
 		}
 		return colomnString;
+	}
+	
+	private String createColumnsSqLite(List<Columns> listColumns) {
+		String columnString = "";
+		int index = 0;
+		for (Columns columns : listColumns) {
+			columnString += "'" + columns.getColomnName() + "'";
+			columnString += " " + columns.getTypeData().getTypeInString();
+			columnString += (!columns.isAutoIncremented()?" ("
+					+ (columns.getValue() != -1 ? columns.getValue() : columns.getDisplaySize() + "," + columns.getDecimalNumber())
+					+ ")":"")
+					+ (columns.isPrimaryKey()?" PRIMARY KEY":"")
+					+ (columns.isAutoIncremented()?" AUTOINCREMENT":"")
+					+ (columns.isNull() ? " DEFAULT NULL" : " NOT NULL");
+			columnString += (index < listColumns.size() - 1 ? ", ":"");
+			index++;
+		}
+		return columnString;
 	}
 
 	private class Connexion {
