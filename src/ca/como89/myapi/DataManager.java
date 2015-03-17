@@ -497,7 +497,7 @@ public class DataManager {
 		String unique = "";
 		int index = 0;
 		for (Columns colomns : listColomns) {
-			colomnString += "'" + colomns.getColomnName() + "'";
+			colomnString += colomns.getColomnName();
 			colomnString += " " + colomns.getTypeData().getTypeInString();
 			colomnString += " ("
 					+ (colomns.getValue() != -1 ? colomns.getValue() : colomns.getDisplaySize() + "," + colomns.getDecimalNumber())

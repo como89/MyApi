@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>MyApi</groupId>
   <artifactId>MyApi</artifactId>
-  <version>1.2</version>
+  <version>1.2.1</version>
   <build>
     <sourceDirectory>src</sourceDirectory>
     <resources>

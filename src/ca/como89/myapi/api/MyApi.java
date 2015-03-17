@@ -12,8 +12,8 @@ import ca.como89.myapi.api.mysql.exception.LengthTableException;
 /**
  * The MyApi library. (MySQL and SQLite library)
  * @author como89
- * @version 1.2
- * @since January 7, 2015
+ * @version 1.2.1
+ * @since March 16, 2015
  *
  */
 public class MyApi {
