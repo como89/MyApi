@@ -1,7 +1,7 @@
 MyApi
 =====
 
-Version 1.2
+Version 1.2.1
 
 MySQL api for plugin developper.
 
