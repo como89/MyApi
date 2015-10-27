@@ -8,9 +8,4 @@ public class MyApiPlugin extends JavaPlugin {
 	public void onEnable(){
 		this.getLogger().info(this.getDescription().getName() + " by " + this.getDescription().getAuthors());
 	}
-	
-	@Override
-	public void onDisable(){
-		
-	}
 }

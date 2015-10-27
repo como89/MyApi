@@ -12,30 +12,41 @@ import java.util.List;
 import java.util.Map;
 
 import ca.como89.myapi.api.ApiResponse;
+import ca.como89.myapi.api.MyApi;
 import ca.como89.myapi.api.TableData;
 import ca.como89.myapi.api.mysql.Columns;
 import ca.como89.myapi.api.mysql.Condition;
 import ca.como89.myapi.api.mysql.TableProperties;
 import ca.como89.myapi.api.mysql.exception.LengthTableException;
 
-public class DataManager {
+public class DataManager implements MyApi{
 
 	private Connection connect;
 	private Connexion connexion;
 	private String path;
 
-	public DataManager(String host, int port, String userName, String password,
-			String databaseName) {
+	public DataManager() {
+		connexion = null;
+		path = null;
+	}
+	
+	@Override
+	public void init(String host, int port, String userName, String password,
+			String databaseName){
 		this.connexion = new Connexion(host, port, userName, password,
 				databaseName);
 	}
 	
-	public DataManager(String path){
+	@Override
+	public void init(String path){
 		this.path = path;
-		this.connexion = null;
 	}
 
-	public void connect() throws ClassNotFoundException, SQLException {
+	@Override
+	public ApiResponse connect() throws ClassNotFoundException, SQLException {
+		if(connexion == null && path == null)
+			return ApiResponse.MYAPI_NOT_INITIALISE;
+		
 		if(connexion == null){
 			Class.forName("org.sqlite.JDBC");
 			connect = DriverManager.getConnection("jdbc:sqlite:" + path);
@@ -45,15 +56,36 @@ public class DataManager {
 				+ ":" + connexion.port + "/" + connexion.databaseName,
 				connexion.username, connexion.password);
 		}
+		return ApiResponse.SUCCESS;
 	}
 
-	public void disconnect() throws SQLException {
+	@Override
+	public ApiResponse disconnect() throws SQLException {
+		if(connexion == null && path == null)
+			return ApiResponse.MYAPI_NOT_INITIALISE;
+		
 		if (connect != null) {
 			connect.close();
+			return ApiResponse.SUCCESS;
 		}
+		return ApiResponse.DATABASE_NOT_CONNECT;
 	}
 	
+	@Override
+	public ApiResponse isConnect() throws SQLException{
+		if(connexion == null && path == null)
+			return ApiResponse.MYAPI_NOT_INITIALISE;
+		
+		if(connect != null){
+			return !connect.isValid(0)?ApiResponse.DATABASE_CONNECTED:ApiResponse.DATABASE_NOT_CONNECT;
+		}
+		return ApiResponse.DATABASE_NOT_CONNECT;
+	}
+	
+	@Override
 	public TableData checkIfTableExist(String tableName) throws IllegalArgumentException{
+		if(connexion == null && path == null)
+			return new TableData(ApiResponse.MYAPI_NOT_INITIALISE,null);
 		DatabaseMetaData databaseMeta = null;
 		try {
 			if(connect == null || connect.isClosed())
@@ -70,7 +102,10 @@ public class DataManager {
 		}
 	}
 	
+	@Override
 	public TableData checkIfColumnExist(String tableName, String columnName) throws IllegalArgumentException{
+		if(connexion == null && path == null)
+			return new TableData(ApiResponse.MYAPI_NOT_INITIALISE,null);
 		DatabaseMetaData databaseMeta = null;
 		try {
 			if(connect == null || connect.isClosed())
@@ -87,7 +122,10 @@ public class DataManager {
 		}
 	}
 	
-	public ApiResponse addColumns(String tableName,List<Columns> listColumns, boolean hisIgnore) throws IllegalArgumentException{
+	@Override
+	public ApiResponse addColumns(String tableName,List<Columns> listColumns, boolean hisIgnore) {
+		if(connexion == null && path == null)
+			return ApiResponse.MYAPI_NOT_INITIALISE;
 		Statement stat = null;
 		try{
 			if(connect == null || connect.isClosed())
@@ -114,7 +152,10 @@ public class DataManager {
 		return ApiResponse.SUCCESS;
 	}
 	
+	@Override
 	public ApiResponse changeColumn(String tableName,String oldColumnName, Columns newColumn, boolean hisIgnore) throws IllegalArgumentException{
+		if(connexion == null && path == null)
+			return ApiResponse.MYAPI_NOT_INITIALISE;
 		Statement stat = null;
 		try{
 			if(connect == null || connect.isClosed())
@@ -143,7 +184,10 @@ public class DataManager {
 		return ApiResponse.SUCCESS;
 	}
 	
+	@Override
 	public ApiResponse removeColumn(String tableName,String columnName,boolean hisIgnore) throws IllegalArgumentException{
+		if(connexion == null && path == null)
+			return ApiResponse.MYAPI_NOT_INITIALISE;
 		Statement stat = null;
 		try{
 			if(connect == null || connect.isClosed())
@@ -169,7 +213,10 @@ public class DataManager {
 		return ApiResponse.SUCCESS;
 	}
 	
+	@Override
 	public TableData countRows(TableProperties tableProperties, Condition condition) throws IllegalArgumentException, LengthTableException{
+		if(connexion == null && path == null)
+			return new TableData(ApiResponse.MYAPI_NOT_INITIALISE,null);
 		Statement stat = null;
 		ResultSet rs = null;
 		Map<Integer,Object> mapValue = null;
@@ -190,7 +237,7 @@ public class DataManager {
 			rs = stat.executeQuery("SELECT " + columnString 
 					+ ", COUNT(*) FROM " + tableProperties.getTableName() 
 					+ " WHERE " + conditionString);
-			mapValue = new HashMap<Integer,Object>();
+			mapValue = new HashMap<>();
 			int index = 0;
 			while(rs.next()){
 				for(String columnName : tableProperties.getColumnName()){
@@ -221,8 +268,11 @@ public class DataManager {
 		}
 		return new TableData(ApiResponse.SUCCESS,mapValue);
 	}
-
+	
+	@Override
 	public ApiResponse deleteRow(String tableName, Condition condition) throws IllegalArgumentException{
+		if(connexion == null && path == null)
+			return ApiResponse.MYAPI_NOT_INITIALISE;
 		Statement stat = null;
 		try {
 			if(connect == null || connect.isClosed())
@@ -247,9 +297,12 @@ public class DataManager {
 		}
 		return ApiResponse.SUCCESS;
 	}
-
+	
+	@Override
 	public ApiResponse createTable(String tableName, List<Columns> listColumns,
 			boolean existCondition) {
+		if(connexion == null && path == null)
+			return ApiResponse.MYAPI_NOT_INITIALISE;
 		Statement stat = null;
 		try {
 			if (connect == null || connect.isClosed())
@@ -257,7 +310,12 @@ public class DataManager {
 			if (tableName == null || listColumns == null)
 				throw new IllegalArgumentException("An argument is null.");
 			stat = connect.createStatement();
-			String columnString = createColumns(listColumns);
+			String columnString = "";
+			if(connexion != null){
+			columnString = createColumns(listColumns);
+			} else {
+			columnString = createColumnsSqLite(listColumns);
+			}
 			stat.execute("CREATE TABLE "
 					+ (existCondition ? "IF NOT EXISTS " : "") + "" + tableName
 					+ " (" + columnString + ")");
@@ -276,35 +334,10 @@ public class DataManager {
 		return ApiResponse.SUCCESS;
 	}
 	
-	public ApiResponse createTableSqLite(String tableName, List<Columns> listColumns,
-			boolean existCondition){
-		Statement stat = null;
-		try {
-			if (connect == null || connect.isClosed())
-				return ApiResponse.DATABASE_NOT_CONNECT;
-			if (tableName == null || listColumns == null)
-				throw new IllegalArgumentException("An argument is null.");
-			stat = connect.createStatement();
-			String columnString = createColumnsSqLite(listColumns);
-			stat.execute("CREATE TABLE "
-					+ (existCondition ? "IF NOT EXISTS " : "") + "" + tableName
-					+ " (" + columnString + ")");
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return ApiResponse.ERROR;
-		} finally {
-			if (stat != null)
-				try {
-					stat.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-					return ApiResponse.ERROR;
-				}
-		}
-		return ApiResponse.SUCCESS;
-	}
-
+	@Override
 	public ApiResponse deleteTable(String tableName) throws IllegalArgumentException{
+		if(connexion == null && path == null)
+			return ApiResponse.MYAPI_NOT_INITIALISE;
 		Statement stat = null;
 		try {
 			if (connect == null || connect.isClosed())
@@ -327,9 +360,12 @@ public class DataManager {
 		}
 		return ApiResponse.SUCCESS;
 	}
-
+	
+	@Override
 	public ApiResponse insertValues(TableProperties tableProperties)
 			throws IllegalArgumentException, LengthTableException, SQLException {
+		if(connexion == null && path == null)
+			return ApiResponse.MYAPI_NOT_INITIALISE;
 		Statement stat = null;
 			if (connect == null || connect.isClosed())
 				return ApiResponse.DATABASE_NOT_CONNECT;
@@ -354,10 +390,12 @@ public class DataManager {
 				}
 			return ApiResponse.SUCCESS;
 	}
-
+	@Override
 	public ApiResponse updateValues(TableProperties tableProperties,
 			Condition condition) throws IllegalArgumentException,
 			LengthTableException {
+		if(connexion == null && path == null)
+			return ApiResponse.MYAPI_NOT_INITIALISE;
 		Statement stat = null;
 		try {
 			if (connect == null || connect.isClosed())
@@ -389,9 +427,11 @@ public class DataManager {
 		}
 		return ApiResponse.SUCCESS;
 	}
-
+	@Override
 	public TableData selectValues(TableProperties tableProperties, Condition condition)
 			throws IllegalArgumentException, LengthTableException {
+		if(connexion == null && path == null)
+			return new TableData(ApiResponse.MYAPI_NOT_INITIALISE,null);
 		Statement stat = null;
 		ResultSet rs = null;
 		Map<Integer,Object> mapValue = null;
@@ -414,7 +454,7 @@ public class DataManager {
 					+ " FROM "
 					+ tableProperties.getTableName()
 					+ (condition != null ? " where " + conditionString : ""));
-			mapValue = new HashMap<Integer,Object>();
+			mapValue = new HashMap<>();
 			int index = 0;
 			while(rs.next()){
 				for(String columnName : tableProperties.getColumnName()){

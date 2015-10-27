@@ -3,7 +3,6 @@ package ca.como89.myapi.api;
 import java.sql.SQLException;
 import java.util.List;
 
-import ca.como89.myapi.DataManager;
 import ca.como89.myapi.api.mysql.Columns;
 import ca.como89.myapi.api.mysql.Condition;
 import ca.como89.myapi.api.mysql.TableProperties;
@@ -12,22 +11,11 @@ import ca.como89.myapi.api.mysql.exception.LengthTableException;
 /**
  * The MyApi library. (MySQL and SQLite library)
  * @author como89
- * @version 1.2.1
- * @since March 16, 2015
+ * @version 1.3
+ * @since October 27, 2015
  *
  */
-public class MyApi {
-
-	private DataManager datamanager;
-	private boolean sqlite;
-	
-	/**
-	 * The constructor to initialize the API.
-	 */
-	public MyApi(){
-		datamanager = null;
-		sqlite = false;
-	}
+public interface MyApi {
 	
 	/**
 	 * This method will initialize the connection information.
@@ -37,20 +25,14 @@ public class MyApi {
 	 * @param password - The password of the username.
 	 * @param databaseName - The database name.
 	 */
-	public void init(String host,int port,String userName,String password,String databaseName){
-		if(datamanager == null){
-		datamanager = new DataManager(host,port,userName,password,databaseName);
-		}
-	}
+	public void init(String host,int port,String userName,String password,String databaseName);
+	
 	/**
 	 * This method will initialize the SQLite connection.
 	 * @param path - The path with the file name and his extension.
 	 */
-	public void init(String path){
-		if(datamanager == null)
-			sqlite = true;
-			datamanager = new DataManager(path);
-	}
+	public void init(String path);
+	
 	/**
 	 * This method will connect the library with the mysql server or SQLite file.
 	 * @return ApiResponse, 
@@ -61,12 +43,7 @@ public class MyApi {
 	 * @throws ClassNotFoundException - When not found the class of jdbc.
 	 * @throws SQLException - SQL problems, connection not found.
 	 */
-	public ApiResponse connect() throws ClassNotFoundException, SQLException{
-		if(datamanager == null)
-			return ApiResponse.MYAPI_NOT_INITIALISE;
-		datamanager.connect();
-		return ApiResponse.SUCCESS;
-	}
+	public ApiResponse connect()throws ClassNotFoundException, SQLException; 
 	
 	/**
 	 * This method will disconnect the library with the mysql server or SQLite file.
@@ -77,12 +54,17 @@ public class MyApi {
 	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
 	 * @throws SQLException - SQL problems, connection not found.
 	 */
-	public ApiResponse disconnect() throws SQLException{
-		if(datamanager == null)
-			return ApiResponse.MYAPI_NOT_INITIALISE;
-		datamanager.disconnect();
-		return ApiResponse.SUCCESS;
-	}
+	public ApiResponse disconnect() throws SQLException;
+
+	/**
+	 * This method will check if the library is connected with the mysql server or SQLite file.
+	 * @return ApiResponse, 
+	 * MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
+	 * DATABASE_CONNECTED, if the library is connected to the database.
+	 * @throws SQLException - SQL problems, connection not found.
+	 */
+	public ApiResponse isConnect() throws SQLException;
 	
 	/**
 	 * This method will create a Table with the name and the columns.
@@ -96,14 +78,8 @@ public class MyApi {
 	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
 	 * @throws IllegalArgumentException - If the parameters are null.
 	 */
-	public ApiResponse createTable(String tableName,List<Columns> listcolumns, boolean existCondition) throws IllegalArgumentException{
-		if(datamanager == null)
-			return ApiResponse.MYAPI_NOT_INITIALISE;
-		if(sqlite){
-			return datamanager.createTableSqLite(tableName, listcolumns, existCondition);
-		}
-		return datamanager.createTable(tableName, listcolumns, existCondition);
-	}
+	public ApiResponse createTable(String tableName,List<Columns> listcolumns, boolean existCondition) throws IllegalArgumentException;
+	
 	/**
 	 * This method will delete a Table with the name.
 	 * @param tableName - The name of the table.
@@ -114,11 +90,7 @@ public class MyApi {
 	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
 	 * @throws IllegalArgumentException - If the parameter is null.
 	 */
-	public ApiResponse deleteTable(String tableName) throws IllegalArgumentException{
-		if(datamanager == null)
-			return ApiResponse.MYAPI_NOT_INITIALISE;
-		return datamanager.deleteTable(tableName);
-	}
+	public ApiResponse deleteTable(String tableName) throws IllegalArgumentException;
 	/**
 	 * This method will insert values with what you have specified in the tableProperties.
 	 * @param tableProperties - The TableProperties object.
@@ -131,11 +103,7 @@ public class MyApi {
 	 * @throws LengthTableException - if the tables are not the same lenght.
 	 * @throws SQLException - SQL problems, connection not found.
 	 */
-	public ApiResponse insertValues(TableProperties tableProperties) throws IllegalArgumentException, LengthTableException, SQLException{
-		if(datamanager == null)
-			return ApiResponse.MYAPI_NOT_INITIALISE;
-		return datamanager.insertValues(tableProperties);
-	}
+	public ApiResponse insertValues(TableProperties tableProperties) throws IllegalArgumentException, LengthTableException, SQLException;
 	
 	/**
 	 * This method will update values with what you have specified in the tableProperties and with the condition.
@@ -149,11 +117,7 @@ public class MyApi {
 	 * @throws LengthTableException - if the tables are not the same lenght.
 	 * @throws IllegalArgumentException - If the parameter is null.
 	 */
-	public ApiResponse updateValues(TableProperties tableProperties, Condition condition) throws IllegalArgumentException, LengthTableException{
-		if(datamanager == null)
-			return ApiResponse.MYAPI_NOT_INITIALISE;
-		return datamanager.updateValues(tableProperties, condition);
-	}
+	public ApiResponse updateValues(TableProperties tableProperties, Condition condition) throws IllegalArgumentException, LengthTableException;
 	/**
 	 * This method will select values with what you have specified in the tableProperties and with the condition.
 	 * @param tableProperties - The TableProperties object.
@@ -162,11 +126,7 @@ public class MyApi {
 	 * @throws IllegalArgumentException - If the parameter is null.
 	 * @throws LengthTableException - if the tables are not the same lenght.
 	 */
-	public TableData selectValues(TableProperties tableProperties, Condition condition) throws IllegalArgumentException, LengthTableException{
-		if(datamanager == null)
-			return new TableData(ApiResponse.MYAPI_NOT_INITIALISE,null);
-		return datamanager.selectValues(tableProperties,condition);
-	}
+	public TableData selectValues(TableProperties tableProperties, Condition condition) throws IllegalArgumentException, LengthTableException;
 	
 	/**
 	 * This method will count rows with what you have specified in the tableProperties and with the condition.
@@ -176,11 +136,7 @@ public class MyApi {
 	 * @throws IllegalArgumentException - If the parameter is null.
 	 * @throws LengthTableException - if the tables are not the same lenght.
 	 */
-	public TableData countRows(TableProperties tableProperties, Condition condition) throws IllegalArgumentException, LengthTableException{
-		if(datamanager == null)
-			return new TableData(ApiResponse.MYAPI_NOT_INITIALISE,null);
-		return datamanager.countRows(tableProperties, condition);
-	}
+	public TableData countRows(TableProperties tableProperties, Condition condition) throws IllegalArgumentException, LengthTableException;
 	
 	/**
 	 * This method will delete rows in the tableName and with the condition.
@@ -193,11 +149,7 @@ public class MyApi {
 	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */
-	public ApiResponse deleteRow(String tableName,Condition condition) throws IllegalArgumentException{
-		if(datamanager == null)
-			return ApiResponse.MYAPI_NOT_INITIALISE;
-		return datamanager.deleteRow(tableName, condition);
-	}
+	public ApiResponse deleteRow(String tableName,Condition condition) throws IllegalArgumentException;
 	/**
 	 * This method will add columns in the tableName.
 	 * @param tableName - The table name.
@@ -210,11 +162,7 @@ public class MyApi {
 	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */
-	public ApiResponse addColumns(String tableName,List<Columns> listColumns, boolean hisIgnore) throws IllegalArgumentException{
-		if(datamanager == null)
-			return ApiResponse.MYAPI_NOT_INITIALISE;
-		return datamanager.addColumns(tableName, listColumns, hisIgnore);
-	}
+	public ApiResponse addColumns(String tableName, List<Columns> listColumns, boolean hisIgnore) throws IllegalArgumentException;
 	
 	/**
 	 * This method will change the column in parameter.
@@ -229,11 +177,7 @@ public class MyApi {
 	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */
-	public ApiResponse changeColumn(String tableName, String oldColumnName, Columns newColumn, boolean hisIgnore) throws IllegalArgumentException{
-		if(datamanager == null)
-			return ApiResponse.MYAPI_NOT_INITIALISE;
-		return datamanager.changeColumn(tableName, oldColumnName, newColumn, hisIgnore);
-	}
+	public ApiResponse changeColumn(String tableName, String oldColumnName, Columns newColumn, boolean hisIgnore) throws IllegalArgumentException;
 	
 	/**
 	 * This method will remove the column in parameter.
@@ -247,11 +191,7 @@ public class MyApi {
 	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */
-	public ApiResponse removeColumn(String tableName, String columnName, boolean hisIgnore) throws IllegalArgumentException{
-		if(datamanager == null)
-			return ApiResponse.MYAPI_NOT_INITIALISE;
-		return datamanager.removeColumn(tableName, columnName, hisIgnore);
-	}
+	public ApiResponse removeColumn(String tableName, String columnName, boolean hisIgnore) throws IllegalArgumentException;
 	
 	/**
 	 * This method will check if the table exist in parameter.
@@ -259,11 +199,7 @@ public class MyApi {
 	 * @return TableData - You can get the result and get response from the api.
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */
-	public TableData checkIfTableExist(String tableName) throws IllegalArgumentException{
-		if(datamanager == null)
-			return new TableData(ApiResponse.MYAPI_NOT_INITIALISE,null);
-		return datamanager.checkIfTableExist(tableName);
-	}
+	public TableData checkIfTableExist(String tableName) throws IllegalArgumentException;
 	
 	/**
 	 * This method will check if the column exist in parameter.
@@ -272,9 +208,5 @@ public class MyApi {
 	 * @return TableData - You can get the result and get response from the api.
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */
-	public TableData checkIfColumnExist(String tableName, String columnName) throws IllegalArgumentException{
-		if(datamanager == null)
-			return new TableData(ApiResponse.MYAPI_NOT_INITIALISE,null);
-		return datamanager.checkIfColumnExist(tableName, columnName);
-	}
+	public TableData checkIfColumnExist(String tableName, String columnName) throws IllegalArgumentException;
 }
