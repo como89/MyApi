@@ -448,7 +448,7 @@ public class DataManager implements MyApi{
 			stat = connect.createStatement();
 			String columnString = createStringColumns(tableProperties
 					.getColumnName());
-			String conditionString = createStringCondition(condition);
+			String conditionString = condition == null?"":createStringCondition(condition);
 			rs = stat.executeQuery("SELECT "
 					+ columnString
 					+ " FROM "
