@@ -1,8 +1,9 @@
-package ca.como89.myapi.api.mysql;
+package ca.como89.myapi.api.sql;
 
-import ca.como89.myapi.DataManager;
-import ca.como89.myapi.api.mysql.exception.IllegalTypeException;
+//import ca.como89.myapi.DataManager;
+import ca.como89.myapi.api.exceptions.IllegalTypeException;
 
+@Deprecated
 public class TableProperties {
 
 	private String tableName;
@@ -17,14 +18,15 @@ public class TableProperties {
 	 * @throws IllegalTypeException - if the type is not supported by MyApi.
 	 * @throws IllegalArgumentException - if the parameters are null.
 	 */
+	@Deprecated
 	public TableProperties(String tableName, String[] columnNames, Object[] value)
 			throws IllegalTypeException, IllegalArgumentException {
 		if (tableName == null || columnNames == null)
 			throw new IllegalArgumentException("An argument is null.");
-			if(!DataManager.checkAllValues(value)) {
-				throw new IllegalTypeException(
-						"This type is not supported by MyApi. Types supported : Integer, Double, String, Character, Float, Boolean and Long");
-		}
+//			if(!DataManager.checkAllValues(value)) {
+//				throw new IllegalTypeException(
+//						"This type is not supported by MyApi. Types supported : Integer, Double, String, Character, Float, Boolean and Long");
+//		}
 		this.tableName = tableName;
 		this.columnName = columnNames;
 		this.values = value;
@@ -36,6 +38,7 @@ public class TableProperties {
 	 * @param columnNames - the name of the columns.
 	 * @throws IllegalArgumentException - if the parameters are null.
 	 */
+	@Deprecated
 	public TableProperties(String tableName, String[] columnNames) 
 			throws IllegalArgumentException{
 		if (tableName == null || columnNames == null)

@@ -1,4 +1,4 @@
-package ca.como89.myapi.api.mysql;
+package ca.como89.myapi.api;
 
 /**
  * The type of the data.

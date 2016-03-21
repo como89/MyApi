@@ -1,4 +1,6 @@
-package ca.como89.myapi.api.mysql;
+package ca.como89.myapi.api.sql;
+
+import ca.como89.myapi.api.TypeData;
 
 public class Columns {
 
@@ -22,6 +24,7 @@ public class Columns {
 	 * @param autoIncremented - If this column can be autoIncremented.
 	 * @param unique - If the values of this column are unique.
 	 */
+	@Deprecated
 	public Columns(String colomnName,TypeData typeData,int value,boolean isNull,boolean primary, boolean autoIncremented, boolean unique){
 		this.colomnName = colomnName;
 		this.typeData = typeData;
@@ -42,6 +45,7 @@ public class Columns {
 	 * @param autoIncremented - If this column can be autoIncremented.
 	 * @param unique - If the values of this column are unique.
 	 */
+	@Deprecated
 	public Columns (String columnName, TypeData typeData, int displaySize, int decimalNumber, boolean isNull,boolean primary, boolean autoIncremented, boolean unique){
 		this.colomnName = columnName;
 		this.typeData = typeData;

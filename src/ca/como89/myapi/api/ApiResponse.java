@@ -15,10 +15,6 @@ public enum ApiResponse {
 	 */
 	DATABASE_NOT_CONNECT,
 	/**
-	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
-	 */
-	MYAPI_NOT_INITIALISE,
-	/**
 	 * DATABASE_CONNECTED, if the library is connected to mysql server / SQL file.
 	 */
 	DATABASE_CONNECTED;

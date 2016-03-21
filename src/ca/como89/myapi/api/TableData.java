@@ -2,7 +2,7 @@ package ca.como89.myapi.api;
 
 import java.util.Map;
 
-
+@Deprecated
 public class TableData {
 
 	private ApiResponse response;

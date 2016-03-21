@@ -1,4 +1,4 @@
-package ca.como89.myapi.api.mysql.exception;
+package ca.como89.myapi.api.exceptions;
 
 public class LengthTableException extends Exception{
 
