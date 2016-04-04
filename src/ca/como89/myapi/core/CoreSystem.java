@@ -49,7 +49,7 @@ import ca.como89.myapi.api.queries.PrefQuery;
 						+ (index + 1 < sizeTotal ? prefQuery.operator[index].toString():"") ;
 				index++;
 			}
-		} else {
+		} else if (listCondition.size() > 0) {
 			Condition c = listCondition.get(0);
 			conditionString += c.columnName + " "
 					+ c.typeCondition.getTypeInString() 

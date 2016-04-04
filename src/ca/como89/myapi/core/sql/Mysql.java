@@ -18,6 +18,7 @@ import ca.como89.myapi.api.TableData;
 import ca.como89.myapi.api.conditions.Condition;
 import ca.como89.myapi.api.exceptions.LengthTableException;
 import ca.como89.myapi.api.queries.InsertQuery;
+import ca.como89.myapi.api.queries.ResultObjects;
 import ca.como89.myapi.api.queries.SelectQuery;
 import ca.como89.myapi.api.queries.UpdateQuery;
 import ca.como89.myapi.api.sql.Columns;
@@ -122,6 +123,7 @@ public class Mysql extends CoreSystem implements MyApi {
 	
 	public ApiResponse sendQuery(InsertQuery insertQuery) throws SQLException {
 		Statement stat = null;
+		try {
 		if (connect == null || connect.isClosed())
 			return ApiResponse.DATABASE_NOT_CONNECT;
 		if(insertQuery == null)
@@ -147,111 +149,92 @@ public class Mysql extends CoreSystem implements MyApi {
 				e.printStackTrace();
 				return ApiResponse.ERROR;
 			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return ApiResponse.ERROR;
+		}
 		return ApiResponse.SUCCESS;
 	}
 
 	@Override
 	public ApiResponse sendQuery(UpdateQuery updateQuery) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		Statement stat = null;
+		try {
+			if (connect == null || connect.isClosed())
+				return ApiResponse.DATABASE_NOT_CONNECT;
+			if(updateQuery == null)
+				throw new IllegalArgumentException("An argument is null.");
+			stat = connect.createStatement();
+			String conditionString = createStringCondition(updateQuery.getConditions(),updateQuery.getPreferences());
+			List<String> listColumns = updateQuery.getListColumns();
+			String tableName = updateQuery.getTableName();
+			
+			for(String columnName : listColumns) {
+				Object value = updateQuery.getValueFromColumn(columnName);
+				stat.execute("UPDATE " + tableName 
+						+ " set " + columnName + " = '"
+						+ value + "' where " + conditionString);
+			}
+		}catch (SQLException e) {
+			e.printStackTrace();
+			return ApiResponse.ERROR;
+		}
+		return ApiResponse.SUCCESS;
 	}
 
 	@Override
 	public ApiResponse sendQuery(SelectQuery selectQuery) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		Statement stat = null;
+		ResultSet rs = null;
+		try {
+		if (connect == null || connect.isClosed())
+			return ApiResponse.DATABASE_NOT_CONNECT;
+		if (selectQuery == null)
+			throw new IllegalArgumentException("An argument is null.");
+		stat = connect.createStatement();
+		
+		List<String> listColumnNames = selectQuery.getListColumns();
+		String columnString = createStringColumns(listColumnNames);
+		
+		String conditionString = createStringCondition(selectQuery.getConditions(),selectQuery.getPreferences());
+		
+		rs = stat.executeQuery("SELECT "
+				+ columnString
+				+ " FROM "
+				+ selectQuery.getTableName()
+				+ (!conditionString.isEmpty() ? " where " + conditionString : ""));
+		
+		ResultObjects resultObject = selectQuery.getResultObjects();
+		while(rs.next()){
+			for(String columnName : listColumnNames) {
+				Object object = rs.getObject(columnName);
+				if(object == null)
+					continue;
+				resultObject.addObject(columnName, object);
+			}
+		}
+	} catch (SQLException e) {
+		e.printStackTrace();
+		return ApiResponse.ERROR;
+	} finally {
+		if (stat != null)
+			try {
+				stat.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return ApiResponse.ERROR;
+			}
+		if(rs != null){
+			try {
+				rs.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return ApiResponse.ERROR;
+			}
+		}
 	}
-
-//	@Override
-//	public ApiResponse updateValues(TableProperties tableProperties, Condition condition)
-//			throws IllegalArgumentException, LengthTableException {
-//		Statement stat = null;
-//		try {
-//			if (connect == null || connect.isClosed())
-//				return ApiResponse.DATABASE_NOT_CONNECT;
-//			if (tableProperties == null || condition == null)
-//				throw new IllegalArgumentException("An argument is null.");
-//			if (tableProperties.getColumnName().length != tableProperties.getValues().length)
-//				throw new LengthTableException(
-//						"The tables are not equals.");
-//			stat = connect.createStatement();
-//			String conditionString = createStringCondition(condition);
-//			for(int i = 0; i < tableProperties.getColumnName().length;i++){
-//				stat.execute("UPDATE " + tableProperties.getTableName() + " set "
-//						+ tableProperties.getColumnName()[i] + " = '"
-//						+ tableProperties.getValues()[i] + "' where "
-//						+ conditionString);
-//			}
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//			return ApiResponse.ERROR;
-//		} finally {
-//			if (stat != null)
-//				try {
-//					stat.close();
-//				} catch (SQLException e) {
-//					e.printStackTrace();
-//					return ApiResponse.ERROR;
-//				}
-//		}
-//		return ApiResponse.SUCCESS;
-//	}
-//
-//	@Override
-//	public TableData selectValues(TableProperties tableProperties, Condition condition)
-//			throws IllegalArgumentException, LengthTableException {
-//		Statement stat = null;
-//		ResultSet rs = null;
-//		Map<Integer,Object> mapValue = null;
-//		try {
-//			if (connect == null || connect.isClosed())
-//				return new TableData(ApiResponse.DATABASE_NOT_CONNECT, null);
-//			if (tableProperties == null)
-//				throw new IllegalArgumentException("An argument is null.");
-//			if (tableProperties.getColumnName().length < 1)
-//				throw new LengthTableException("You need some colomns.");
-//			if (tableProperties.getColumnName()[0].equals("*"))
-//				throw new IllegalArgumentException(
-//						"The * doesn't exist with MyApi.");
-//			stat = connect.createStatement();
-//			String columnString = createStringColumns(tableProperties
-//					.getColumnName());
-//			String conditionString = condition == null?"":createStringCondition(condition);
-//			rs = stat.executeQuery("SELECT "
-//					+ columnString
-//					+ " FROM "
-//					+ tableProperties.getTableName()
-//					+ (condition != null ? " where " + conditionString : ""));
-//			mapValue = new HashMap<>();
-//			int index = 0;
-//			while(rs.next()){
-//				for(String columnName : tableProperties.getColumnName()){
-//				mapValue.put(index, rs.getObject(columnName));
-//				index++;
-//				}
-//			}
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//			return new TableData(ApiResponse.ERROR, null);
-//		} finally {
-//			if (stat != null)
-//				try {
-//					stat.close();
-//				} catch (SQLException e) {
-//					e.printStackTrace();
-//					return new TableData(ApiResponse.ERROR, null);
-//				}
-//			if(rs != null){
-//				try {
-//					rs.close();
-//				} catch (SQLException e) {
-//					e.printStackTrace();
-//					return new TableData(ApiResponse.ERROR, null);
-//				}
-//			}
-//		}
-//		return new TableData(ApiResponse.SUCCESS, mapValue);
-//	}
+		return ApiResponse.SUCCESS;
+	}
 //
 //	@Override
 //	public TableData countRows(TableProperties tableProperties, Condition condition)
