@@ -8,7 +8,7 @@ import ca.como89.myapi.api.ApiResponse;
 import ca.como89.myapi.api.MyApi;
 import ca.como89.myapi.api.TableData;
 import ca.como89.myapi.api.conditions.Condition;
-import ca.como89.myapi.api.exceptions.LengthTableException;
+import ca.como89.myapi.api.queries.CountRowsQuery;
 import ca.como89.myapi.api.queries.InsertQuery;
 import ca.como89.myapi.api.queries.SelectQuery;
 import ca.como89.myapi.api.queries.UpdateQuery;
@@ -28,7 +28,7 @@ public class MongoDB extends CoreSystem implements MyApi {
 	}
 
 	@Override
-	public ApiResponse connect() throws ClassNotFoundException, SQLException {
+	public ApiResponse connect() {
 		return null;
 	}
 
@@ -109,6 +109,12 @@ public class MongoDB extends CoreSystem implements MyApi {
 
 	@Override
 	public ApiResponse sendQuery(SelectQuery selectQuery) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ApiResponse sendQuery(CountRowsQuery countRowsQuery) throws SQLException, IllegalArgumentException {
 		// TODO Auto-generated method stub
 		return null;
 	}

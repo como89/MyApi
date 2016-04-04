@@ -5,5 +5,6 @@ public enum QueryType {
 	INSERT,
 	UPDATE,
 	REPLACE,
-	SELECT;
+	SELECT,
+	COUNT_ROWS;
 }

@@ -47,7 +47,7 @@ public abstract class Query {
 	}
 	
 	protected void throwsExceptionNotValidColumn() throws NotValidColumnException {
-		throw new NotValidColumnException("The column name is not valid. The name already exist or the name is restricted for sql syntax.");
+		throw new NotValidColumnException("The column name is not valid. The name is restricted for sql syntax.");
 	}
 	
 	protected boolean validColumn(String columnName) {

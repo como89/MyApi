@@ -13,33 +13,6 @@ import ca.como89.myapi.core.sql.SQLite;
 public class InstanceApi {
 	
 	private InstanceApi() {}
-	public static void test () {
-		String pseudo = "como89";
-		String nomServeur = "PvpFac";
-		
-		MyApi myapi = InstanceApi.createInstance(null);
-		
-		//Nouvelle méthode pour l'insert avec MyApi 2.0
-		//On crée une instance de InsertQuery
-		InsertQuery insertQuery = new InsertQuery();
-		
-		//On ajoute le nom de la colonne et la valeur qu'on veut insérer.
-		try {
-		insertQuery.addColumn("IdAchat",1004);
-		insertQuery.addColumn("Pseudo", pseudo);
-		insertQuery.addColumn("Serveur", nomServeur);
-		insertQuery.setColumn("IdAchat", 1050);
-		} catch (NotValidColumnException e) {
-			e.printStackTrace();
-		}
-		
-		//On envoit la requête.
-		try {
-			myapi.sendQuery(insertQuery);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
 
 	private static HashMap<ApiDatabase, MyApi> listApi = new HashMap<>();
 	

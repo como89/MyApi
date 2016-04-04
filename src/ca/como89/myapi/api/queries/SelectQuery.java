@@ -8,7 +8,7 @@ public class SelectQuery extends ConditionQuery {
 
 	public SelectQuery() {
 		super(QueryType.SELECT);
-		this.resultObjects = new ResultObjects();
+		resultObjects = null;
 	}
 	
 	@Override
@@ -22,7 +22,14 @@ public class SelectQuery extends ConditionQuery {
 	}
 	
 	public ResultObjects getResultObjects(){
-		return resultObjects;
+		ResultObjects result = resultObjects;
+		if(result == null) {
+			resultObjects = new ResultObjects();
+			result = resultObjects;
+		} else {
+			resultObjects = null;
+		}
+	    return result;
 	}
 
 }

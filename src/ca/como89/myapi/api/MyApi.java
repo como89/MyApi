@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import ca.como89.myapi.api.conditions.Condition;
-import ca.como89.myapi.api.exceptions.LengthTableException;
+import ca.como89.myapi.api.queries.CountRowsQuery;
 import ca.como89.myapi.api.queries.InsertQuery;
 import ca.como89.myapi.api.queries.SelectQuery;
 import ca.como89.myapi.api.queries.UpdateQuery;
@@ -14,7 +14,7 @@ import ca.como89.myapi.api.sql.Columns;
  * The MyApi library. (MySQL, SQLite and NOSQL MongoDB library)
  * @author como89
  * @version 2.0
- * @since March 12, 2016
+ * @since April 4, 2016
  *
  */
 public interface MyApi {
@@ -30,20 +30,16 @@ public interface MyApi {
 	 * @return ApiResponse, 
 	 * SUCCESS - if the operation success. 
 	 * ERROR, if a sql error happen. 
-	 * MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
-	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
-	 * @throws ClassNotFoundException - When not found the class of jdbc.
-	 * @throws SQLException - SQL problems, connection not found.
+	 * DATABASE_NOT_CONNECT, if the library is not connected with the mysql server.
 	 */
-	public ApiResponse connect()throws ClassNotFoundException, SQLException; 
+	public ApiResponse connect(); 
 	
 	/**
 	 * This method will disconnect the library with the mysql server, SQLite file or noSQL mongoDB.
 	 * @return ApiResponse, 
 	 * SUCCESS - if the operation success. 
 	 * ERROR, if a sql error happen. 
-	 * MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
-	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
+	 * DATABASE_NOT_CONNECT, if the library is not connected with the mysql server.
 	 * @throws SQLException - SQL problems, connection not found.
 	 */
 	public ApiResponse disconnect() throws SQLException;
@@ -51,8 +47,7 @@ public interface MyApi {
 	/**
 	 * This method will check if the library is connected with the mysql server, SQLite file or noSQL mongoDB.
 	 * @return ApiResponse, 
-	 * MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
-	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
+	 * DATABASE_NOT_CONNECT, if the library is not connected with the mysql server.
 	 * DATABASE_CONNECTED, if the library is connected to the database.
 	 * @throws SQLException - SQL problems, connection not found.
 	 */
@@ -66,8 +61,7 @@ public interface MyApi {
 	 * @return ApiResponse, 
 	 * SUCCESS - if the operation success. 
 	 * ERROR, if a sql error happen. 
-	 * MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
-	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
+	 * DATABASE_NOT_CONNECT, if the library is not connected with the mysql server.
 	 * @throws IllegalArgumentException - If the parameters are null.
 	 */
 	public ApiResponse createTable(String tableName,List<Columns> listColumns, boolean existCondition) throws IllegalArgumentException;
@@ -78,28 +72,58 @@ public interface MyApi {
 	 * @return ApiResponse, 
 	 * SUCCESS - if the operation success. 
 	 * ERROR, if a sql error happen. 
-	 * MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
-	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
+	 * DATABASE_NOT_CONNECT, if the library is not connected with the mysql server.
 	 * @throws IllegalArgumentException - If the parameter is null.
 	 */
 	public ApiResponse deleteTable(String tableName) throws IllegalArgumentException;
+	
 	/**
-	 * This method will insert values with what you have specified in the tableProperties.
-	 * @param tableProperties - The TableProperties object.
+	 * This method will insert values with what you have specified in the InsertQuery.
+	 * @param insertQuery - The InsertQuery class.
 	 * @return ApiResponse, 
 	 * SUCCESS - if the operation success. 
 	 * ERROR, if a sql error happen. 
-	 * MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
-	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
+	 * DATABASE_NOT_CONNECT, if the library is not connected with the mysql server.
 	 * @throws IllegalArgumentException - If the parameter is null.
-	 * @throws LengthTableException - if the tables are not the same lenght.
 	 * @throws SQLException - SQL problems, connection not found.
 	 */
-	public ApiResponse sendQuery(InsertQuery insertQuery) throws SQLException;
+	public ApiResponse sendQuery(InsertQuery insertQuery) throws SQLException,IllegalArgumentException;
 	
-	public ApiResponse sendQuery(UpdateQuery updateQuery) throws SQLException;
+	/**
+	 * This method will update values with what you have specified in the UpdateQuery.
+	 * @param updateQuery - The UpdateQuery class.
+	 * @return ApiResponse, 
+	 * SUCCESS - if the operation success. 
+	 * ERROR, if a sql error happen. 
+	 * DATABASE_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * @throws IllegalArgumentException - If the parameter is null.
+	 * @throws SQLException - SQL problems, connection not found.
+	 */
+	public ApiResponse sendQuery(UpdateQuery updateQuery) throws SQLException,IllegalArgumentException;
 	
-	public ApiResponse sendQuery(SelectQuery selectQuery) throws SQLException;
+	/**
+	 * This method will select values with what you have specified in the SelectQuery.
+	 * @param selectQuery - The SelectQuery class.
+	 * @return ApiResponse, 
+	 * SUCCESS - if the operation success. 
+	 * ERROR, if a sql error happen. 
+	 * DATABASE_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * @throws IllegalArgumentException - If the parameter is null.
+	 * @throws SQLException - SQL problems, connection not found.
+	 */
+	public ApiResponse sendQuery(SelectQuery selectQuery) throws SQLException,IllegalArgumentException;
+	
+	/**
+	 * This method will countRows with what you have specified in the CountRowsQuery.
+	 * @param countRowsQuery - The CountRowsQuery class.
+	 * @return ApiResponse, 
+	 * SUCCESS - if the operation success. 
+	 * ERROR, if a sql error happen. 
+	 * DATABASE_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * @throws IllegalArgumentException - If the parameter is null.
+	 * @throws SQLException - SQL problems, connection not found.
+	 */
+	public ApiResponse sendQuery(CountRowsQuery countRowsQuery) throws SQLException,IllegalArgumentException;
 	
 	/**
 	 * This method will delete rows in the tableName and with the condition.
@@ -108,11 +132,12 @@ public interface MyApi {
 	 * @return ApiResponse, 
 	 * SUCCESS - if the operation success. 
 	 * ERROR, if a sql error happen. 
-	 * MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * DATABASE_NOT_CONNECT, if the library is not connected with the mysql server.
 	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */
 	public ApiResponse deleteRow(String tableName,Condition condition) throws IllegalArgumentException;
+	
 	/**
 	 * This method will add columns in the tableName.
 	 * @param tableName - The table name.
@@ -121,7 +146,7 @@ public interface MyApi {
 	 * @return ApiResponse, 
 	 * SUCCESS - if the operation success. 
 	 * ERROR, if a sql error happen. 
-	 * MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * DATABASE_NOT_CONNECT, if the library is not connected with the mysql server.
 	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */
@@ -136,7 +161,7 @@ public interface MyApi {
 	 * @return ApiResponse, 
 	 * SUCCESS - if the operation success. 
 	 * ERROR, if a sql error happen. 
-	 * MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * DATABASE_NOT_CONNECT, if the library is not connected with the mysql server.
 	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */
@@ -150,7 +175,7 @@ public interface MyApi {
 	 * @return ApiResponse, 
 	 * SUCCESS - if the operation success. 
 	 * ERROR, if a sql error happen. 
-	 * MYSQL_NOT_CONNECT, if the library is not connected with the mysql server.
+	 * DATABASE_NOT_CONNECT, if the library is not connected with the mysql server.
 	 * MYAPI_NOT_INITIALISE, if the library is not initialise correctly.
 	 * @throws IllegalArgumentException - If a parameter is null.
 	 */

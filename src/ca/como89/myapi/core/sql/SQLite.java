@@ -1,119 +1,64 @@
 package ca.como89.myapi.core.sql;
 
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 import ca.como89.myapi.api.ApiDatabase;
 import ca.como89.myapi.api.ApiResponse;
-import ca.como89.myapi.api.MyApi;
-import ca.como89.myapi.api.TableData;
-import ca.como89.myapi.api.conditions.Condition;
-import ca.como89.myapi.api.exceptions.LengthTableException;
-import ca.como89.myapi.api.queries.InsertQuery;
-import ca.como89.myapi.api.queries.SelectQuery;
-import ca.como89.myapi.api.queries.UpdateQuery;
 import ca.como89.myapi.api.sql.Columns;
-import ca.como89.myapi.api.sql.TableProperties;
-import ca.como89.myapi.core.CoreSystem;
 
-@SuppressWarnings("deprecation")
-public class SQLite extends CoreSystem implements MyApi{
+public class SQLite extends Mysql{
 
 	public SQLite(ApiDatabase apiDatabase) {
 		super(apiDatabase);
 	}
 
 	@Override
-	public String getProjectName() {
-		return apiDatabase.projectName;
-	}
-
-	@Override
-	public ApiResponse connect() throws ClassNotFoundException, SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ApiResponse disconnect() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ApiResponse isConnect() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public ApiResponse createTable(String tableName, List<Columns> listColumns, boolean existCondition)
 			throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return null;
+		Statement stat = null;
+		try {
+			if (connect == null || connect.isClosed())
+				return ApiResponse.DATABASE_NOT_CONNECT;
+			if (tableName == null || listColumns == null)
+				throw new IllegalArgumentException("An argument is null.");
+			stat = connect.createStatement();
+			String columnString = createColumnsSqLite(listColumns);
+			stat.execute("CREATE TABLE "
+					+ (existCondition ? "IF NOT EXISTS " : "") + "" + tableName
+					+ " (" + columnString + ")");
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return ApiResponse.ERROR;
+		} finally {
+			if (stat != null)
+				try {
+					stat.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+					return ApiResponse.ERROR;
+				}
+		}
+		return ApiResponse.SUCCESS;
 	}
 
-	@Override
-	public ApiResponse deleteTable(String tableName) throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ApiResponse deleteRow(String tableName, Condition condition) throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ApiResponse addColumns(String tableName, List<Columns> listColumns, boolean hisIgnore)
-			throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ApiResponse changeColumn(String tableName, String oldColumnName, Columns newColumn, boolean hisIgnore)
-			throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ApiResponse removeColumn(String tableName, String columnName, boolean hisIgnore)
-			throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public TableData checkIfTableExist(String tableName) throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public TableData checkIfColumnExist(String tableName, String columnName) throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ApiResponse sendQuery(InsertQuery insertQuery) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ApiResponse sendQuery(UpdateQuery updateQuery) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ApiResponse sendQuery(SelectQuery selectQuery) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+	private String createColumnsSqLite(List<Columns> listColumns) {
+		String columnString = "";
+		int index = 0;
+		for (Columns columns : listColumns) {
+			columnString += "'" + columns.getColomnName() + "'";
+			columnString += " " + columns.getTypeData().getTypeInString();
+			columnString += (!columns.isAutoIncremented()?" ("
+					+ (columns.getValue() != -1 ? columns.getValue() : columns.getDisplaySize() + ","
+					+ columns.getDecimalNumber()) + ")":"")
+					+ (columns.isPrimaryKey()?" PRIMARY KEY":"")
+					+ (columns.isAutoIncremented()?" AUTOINCREMENT":"")
+					+ (columns.isNull() ? " DEFAULT NULL" : " NOT NULL");
+			columnString += (index < listColumns.size() - 1 ? ", ":"");
+			index++;
+		}
+		return columnString;
 	}
 
 }

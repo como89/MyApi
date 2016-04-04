@@ -7,16 +7,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import ca.como89.myapi.api.ApiDatabase;
 import ca.como89.myapi.api.ApiResponse;
 import ca.como89.myapi.api.MyApi;
 import ca.como89.myapi.api.TableData;
 import ca.como89.myapi.api.conditions.Condition;
-import ca.como89.myapi.api.exceptions.LengthTableException;
+import ca.como89.myapi.api.queries.CountRowsQuery;
 import ca.como89.myapi.api.queries.InsertQuery;
 import ca.como89.myapi.api.queries.ResultObjects;
 import ca.como89.myapi.api.queries.SelectQuery;
@@ -27,7 +25,7 @@ import ca.como89.myapi.core.CoreSystem;
 
 public class Mysql extends CoreSystem implements MyApi {
 	
-	private Connection connect;
+	protected Connection connect;
 
 	public Mysql(ApiDatabase apiDatabase) {
 		super(apiDatabase);
@@ -173,7 +171,7 @@ public class Mysql extends CoreSystem implements MyApi {
 				Object value = updateQuery.getValueFromColumn(columnName);
 				stat.execute("UPDATE " + tableName 
 						+ " set " + columnName + " = '"
-						+ value + "' where " + conditionString);
+						+ value + "' " + (!conditionString.isEmpty() ? " where " + conditionString : ""));
 			}
 		}catch (SQLException e) {
 			e.printStackTrace();
@@ -235,61 +233,52 @@ public class Mysql extends CoreSystem implements MyApi {
 	}
 		return ApiResponse.SUCCESS;
 	}
-//
-//	@Override
-//	public TableData countRows(TableProperties tableProperties, Condition condition)
-//			throws IllegalArgumentException, LengthTableException {
-//		Statement stat = null;
-//		ResultSet rs = null;
-//		Map<Integer,Object> mapValue = null;
-//		try {
-//			if(connect == null || connect.isClosed())
-//				return new TableData(ApiResponse.DATABASE_NOT_CONNECT,null);
-//			if(tableProperties == null || condition == null)
-//				throw new IllegalArgumentException("An argument is null.");
-//			if (tableProperties.getColumnName().length < 1)
-//				throw new LengthTableException("You need some colomns.");
-//			if (tableProperties.getColumnName()[0].equals("*"))
-//				throw new IllegalArgumentException(
-//						"The * doesn't exist with MyApi.");
-//			stat = connect.createStatement();
-//			String columnString = createStringColumns(tableProperties
-//					.getColumnName());
-//			String conditionString = createStringCondition(condition);
-//			rs = stat.executeQuery("SELECT " + columnString 
-//					+ ", COUNT(*) FROM " + tableProperties.getTableName() 
-//					+ " WHERE " + conditionString);
-//			mapValue = new HashMap<>();
-//			int index = 0;
-//			while(rs.next()){
-//				for(String columnName : tableProperties.getColumnName()){
-//				mapValue.put(index, rs.getObject(columnName));
-//				index++;
-//				}
-//			}
-//		}catch(SQLException e){
-//			e.printStackTrace();
-//			return new TableData(ApiResponse.ERROR,null);
-//		}
-//		finally {
-//			if (stat != null)
-//				try {
-//					stat.close();
-//				} catch (SQLException e) {
-//					e.printStackTrace();
-//					return new TableData(ApiResponse.ERROR, null);
-//				}
-//			if(rs != null){
-//				try {
-//					rs.close();
-//				} catch (SQLException e) {
-//					e.printStackTrace();
-//					return new TableData(ApiResponse.ERROR, null);
-//				}
-//			}
-//		}
-//		return new TableData(ApiResponse.SUCCESS,mapValue);
-//	}
+	
+	@Override
+	public ApiResponse sendQuery(CountRowsQuery countRowsQuery) throws SQLException {
+		Statement stat = null;
+		ResultSet rs = null;
+		
+		try {
+		if(connect == null || connect.isClosed())
+			return ApiResponse.DATABASE_NOT_CONNECT;
+		if(countRowsQuery == null)
+			throw new IllegalArgumentException("An argument is null.");
+		stat = connect.createStatement();
+		
+		ArrayList<Condition> listCondition = countRowsQuery.getConditions();
+		
+		String conditionString = createStringCondition(listCondition,countRowsQuery.getPreferences());
+		rs = stat.executeQuery("SELECT COUNT(*) FROM " + countRowsQuery.getTableName() 
+		+ (!conditionString.isEmpty() ? " where " + conditionString : ""));
+		
+		while(rs.next()){
+			countRowsQuery.setNbRows(rs.getInt(1));
+		}
+	}catch(SQLException e){
+		e.printStackTrace();
+		return ApiResponse.ERROR;
+	}
+	finally {
+		if (stat != null)
+			try {
+				stat.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return ApiResponse.ERROR;
+			}
+		if(rs != null){
+			try {
+				rs.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return ApiResponse.ERROR;
+			}
+		}
+	}
+		
+		return ApiResponse.SUCCESS;
+	}
 
 	/*
 	 * Todo(non-Javadoc)
