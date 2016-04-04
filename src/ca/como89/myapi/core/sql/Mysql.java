@@ -11,16 +11,14 @@ import java.util.List;
 
 import ca.como89.myapi.api.ApiDatabase;
 import ca.como89.myapi.api.ApiResponse;
+import ca.como89.myapi.api.Columns;
 import ca.como89.myapi.api.MyApi;
-import ca.como89.myapi.api.TableData;
 import ca.como89.myapi.api.conditions.Condition;
 import ca.como89.myapi.api.queries.CountRowsQuery;
 import ca.como89.myapi.api.queries.InsertQuery;
 import ca.como89.myapi.api.queries.ResultObjects;
 import ca.como89.myapi.api.queries.SelectQuery;
 import ca.como89.myapi.api.queries.UpdateQuery;
-import ca.como89.myapi.api.sql.Columns;
-import ca.como89.myapi.api.sql.TableProperties;
 import ca.como89.myapi.core.CoreSystem;
 
 public class Mysql extends CoreSystem implements MyApi {
@@ -400,38 +398,38 @@ public class Mysql extends CoreSystem implements MyApi {
 	}
 
 	@Override
-	public TableData checkIfTableExist(String tableName) throws IllegalArgumentException {
+	public boolean checkIfTableExist(String tableName) throws IllegalArgumentException {
 		DatabaseMetaData databaseMeta = null;
 		try {
 			if(connect == null || connect.isClosed())
-				return new TableData(ApiResponse.DATABASE_NOT_CONNECT,false);
+				return false;
 		if(tableName == null)
 			throw new IllegalArgumentException("An argument is null.");
 		databaseMeta = connect.getMetaData();
 		ResultSet rs = null;
 		rs = databaseMeta.getTables(null, null, tableName, null);
-		return (rs.next()?new TableData(ApiResponse.SUCCESS,true):new TableData(ApiResponse.SUCCESS,false));
+		return rs.next();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return new TableData(ApiResponse.ERROR,false);
+			return false;
 		}
 	}
 
 	@Override
-	public TableData checkIfColumnExist(String tableName, String columnName) throws IllegalArgumentException {
+	public boolean checkIfColumnExist(String tableName, String columnName) throws IllegalArgumentException {
 		DatabaseMetaData databaseMeta = null;
 		try {
 			if(connect == null || connect.isClosed())
-				return new TableData(ApiResponse.DATABASE_NOT_CONNECT,false);
+				return false;
 		if(tableName == null || columnName == null)
 			throw new IllegalArgumentException("An argument is null.");
 		databaseMeta = connect.getMetaData();
 		ResultSet rs = null;
 		rs = databaseMeta.getColumns(null, null, tableName, columnName);
-		return (rs.next()?new TableData(ApiResponse.SUCCESS,true):new TableData(ApiResponse.SUCCESS,false));
+		return rs.next();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return new TableData(ApiResponse.ERROR,false);
+			return false;
 		}
 	}
 	
@@ -441,18 +439,18 @@ public class Mysql extends CoreSystem implements MyApi {
 		String unique = "";
 		int index = 0;
 		for (Columns colomns : listColomns) {
-			colomnString += colomns.getColomnName();
-			colomnString += " " + colomns.getTypeData().getTypeInString();
+			colomnString += colomns.colomnName;
+			colomnString += " " + colomns.typeData.toString();
 			colomnString += " ("
-					+ (colomns.getValue() != -1 ? colomns.getValue() : colomns.getDisplaySize() + "," + colomns.getDecimalNumber())
+					+ (colomns.value != -1 ? colomns.value : colomns.displaySize + "," + colomns.decimalNumber)
 					+ ")"
-					+ (colomns.isNull() ? " DEFAULT NULL " : " NOT NULL")
-					+ (colomns.isAutoIncremented()?" AUTO_INCREMENT" : "");
-			if (colomns.isPrimaryKey()) {
-				primaryKey = " PRIMARY KEY (" + colomns.getColomnName() + ")";
+					+ (colomns.isNull ? " DEFAULT NULL " : " NOT NULL")
+					+ (colomns.autoIncremented?" AUTO_INCREMENT" : "");
+			if (colomns.primary) {
+				primaryKey = " PRIMARY KEY (" + colomns.colomnName + ")";
 			}
-			else if(colomns.isUnique()){
-				unique = " UNIQUE (" + colomns.getColomnName() + ")";
+			else if(colomns.unique){
+				unique = " UNIQUE (" + colomns.colomnName + ")";
 			}
 			colomnString += (index < listColomns.size() - 1 ? ", " : (!primaryKey.isEmpty() || !unique.isEmpty()?",":"")
 					+ primaryKey + (!unique.isEmpty() && !primaryKey.isEmpty()?",":"") +  unique);

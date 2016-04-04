@@ -5,15 +5,13 @@ import java.util.List;
 
 import ca.como89.myapi.api.ApiDatabase;
 import ca.como89.myapi.api.ApiResponse;
+import ca.como89.myapi.api.Columns;
 import ca.como89.myapi.api.MyApi;
-import ca.como89.myapi.api.TableData;
 import ca.como89.myapi.api.conditions.Condition;
 import ca.como89.myapi.api.queries.CountRowsQuery;
 import ca.como89.myapi.api.queries.InsertQuery;
 import ca.como89.myapi.api.queries.SelectQuery;
 import ca.como89.myapi.api.queries.UpdateQuery;
-import ca.como89.myapi.api.sql.Columns;
-import ca.como89.myapi.api.sql.TableProperties;
 import ca.como89.myapi.core.CoreSystem;
 
 public class MongoDB extends CoreSystem implements MyApi {
@@ -82,17 +80,15 @@ public class MongoDB extends CoreSystem implements MyApi {
 	}
 
 	@Override
-	@Deprecated
-	public TableData checkIfTableExist(String tableName) throws IllegalArgumentException {
+	public boolean checkIfTableExist(String tableName) throws IllegalArgumentException {
 		// TODO Auto-generated method stub
-		return null;
+		return false;
 	}
 
 	@Override
-	@Deprecated
-	public TableData checkIfColumnExist(String tableName, String columnName) throws IllegalArgumentException {
+	public boolean checkIfColumnExist(String tableName, String columnName) throws IllegalArgumentException {
 		// TODO Auto-generated method stub
-		return null;
+		return false;
 	}
 
 	@Override

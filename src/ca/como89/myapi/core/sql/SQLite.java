@@ -6,7 +6,7 @@ import java.util.List;
 
 import ca.como89.myapi.api.ApiDatabase;
 import ca.como89.myapi.api.ApiResponse;
-import ca.como89.myapi.api.sql.Columns;
+import ca.como89.myapi.api.Columns;
 
 public class SQLite extends Mysql{
 
@@ -47,14 +47,14 @@ public class SQLite extends Mysql{
 		String columnString = "";
 		int index = 0;
 		for (Columns columns : listColumns) {
-			columnString += "'" + columns.getColomnName() + "'";
-			columnString += " " + columns.getTypeData().getTypeInString();
-			columnString += (!columns.isAutoIncremented()?" ("
-					+ (columns.getValue() != -1 ? columns.getValue() : columns.getDisplaySize() + ","
-					+ columns.getDecimalNumber()) + ")":"")
-					+ (columns.isPrimaryKey()?" PRIMARY KEY":"")
-					+ (columns.isAutoIncremented()?" AUTOINCREMENT":"")
-					+ (columns.isNull() ? " DEFAULT NULL" : " NOT NULL");
+			columnString += "'" + columns.colomnName + "'";
+			columnString += " " + columns.typeData.toString();
+			columnString += (!columns.autoIncremented?" ("
+					+ (columns.value != -1 ? columns.value : columns.displaySize + ","
+					+ columns.decimalNumber) + ")":"")
+					+ (columns.primary?" PRIMARY KEY":"")
+					+ (columns.autoIncremented?" AUTOINCREMENT":"")
+					+ (columns.isNull ? " DEFAULT NULL" : " NOT NULL");
 			columnString += (index < listColumns.size() - 1 ? ", ":"");
 			index++;
 		}

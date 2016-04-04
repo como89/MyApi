@@ -1,20 +1,28 @@
 package ca.como89.myapi.api.conditions;
 
+/**
+ * This enum is the type of the condition.
+ *
+ */
 public enum TypeCondition {
 	/**
-	 * EQUALS -  = 
+	 * EQUALS 
+	 *  ' = '
 	 */
 	EQUALS("="),
 	/**
-	 * GREATER -  >
+	 * GREATER 
+	 *  ' > '
 	 */
 	GREATER(">"),
 	/**
-	 * SMALLER -  < 
+	 * SMALLER 
+	 *  ' < ' 
 	 */
 	SMALLER("<"),
 	/**
-	 * NOT_EQUALS - != 
+	 * NOT_EQUALS
+	 *  ' != ' 
 	 */
 	NOT_EQUALS("!=");
 	
@@ -24,7 +32,8 @@ public enum TypeCondition {
 		this.type = type;
 	}
 	
-	public String getTypeInString(){
+	@Override
+	public String toString() {
 		return type;
 	}
 }

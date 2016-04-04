@@ -4,8 +4,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 
 import ca.como89.myapi.api.ApiDatabase.DatabaseType;
-import ca.como89.myapi.api.exceptions.NotValidColumnException;
-import ca.como89.myapi.api.queries.InsertQuery;
 import ca.como89.myapi.core.nosql.MongoDB;
 import ca.como89.myapi.core.sql.Mysql;
 import ca.como89.myapi.core.sql.SQLite;

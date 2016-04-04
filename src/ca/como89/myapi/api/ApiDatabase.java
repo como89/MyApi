@@ -1,37 +1,66 @@
 package ca.como89.myapi.api;
 
+/**
+ * This class is use to initialize all information about the database.
+ *
+ */
 public class ApiDatabase {
-	
-	public String path,projectName,host,username,password,databaseName;
+	/**
+	 * The path of the SQLite file.
+	 */
+	public String path,
+	/**
+	 * The projectName for a reference.
+	 */
+	projectName,
+	/**
+	 * The host of the database.
+	 */
+	host,
+	/**
+	 * The user name of the database.
+	 */
+	username,
+	/**
+	 * The password of the database.
+	 */
+	password,
+	/**
+	 * The name of the database.
+	 */
+	databaseName;
+	/**
+	 * The port of the database.
+	 */
 	public int port;
-	DatabaseType databaseType;
+	/**
+	 * The type of the database, see @DatabaseType
+	 */
+	public DatabaseType databaseType;
 
-	public ApiDatabase(String projectName, String path) {
-		this.projectName = projectName;
-		this.path = path;
-		this.databaseType = DatabaseType.SQLITE;
-	}
-	
-	public ApiDatabase(String projectName, String host, int port, String username, String password, String databaseName) {
-		this.projectName = projectName;
-		this.host = host;
-		this.port = port;
-		this.username = username;
-		this.password = password;
-		this.databaseName = databaseName;
-		this.databaseType = DatabaseType.MYSQL;
-	}
-	
-	public ApiDatabase(String host, int port, String databaseName) {
-		this.host = host;
-		this.port = port;
-		this.databaseName = databaseName;
-		this.databaseType = DatabaseType.NO_SQL_MONGODB;
+	/**
+	 * Default constructor
+	 */
+	public ApiDatabase() {
+		
 	}
 
+	/**
+	 * The type of the database.
+	 *
+	 */
 	public enum DatabaseType {
+		/**
+		 * If you want to use Mysql, choose this one.
+		 */
 		MYSQL,
+		/**
+		 * If you want to use SQLite, choose this one.
+		 */
 		SQLITE,
+		/**
+		 * If you want to use MongoDB, choose this one.
+		 */
 		NO_SQL_MONGODB;
 	}	
 }

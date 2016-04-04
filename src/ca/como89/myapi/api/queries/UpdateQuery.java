@@ -2,12 +2,16 @@ package ca.como89.myapi.api.queries;
 
 import ca.como89.myapi.api.exceptions.NotValidColumnException;
 
+/**
+ * This class is when you need to update values in a table.
+ */
 public class UpdateQuery extends ConditionQuery {
 
-	public UpdateQuery() {
-		super(QueryType.UPDATE);
-	}
+	public UpdateQuery() {}
 	
+	/**
+	 * See addColumn(String,Object) method in @Query class.
+	 */
 	@Override
 	public boolean addColumn(String columnName,Object value) throws NotValidColumnException {
 		if(!validColumn(columnName))
@@ -18,14 +22,14 @@ public class UpdateQuery extends ConditionQuery {
 		return true;
 	}
 	
+	/**
+	 * See setColumn(String,Object) method in @Query class.
+	 */
 	@Override
-	public boolean setColumn(String columnName,Object value) throws NotValidColumnException {
+	public void setColumn(String columnName,Object value) throws NotValidColumnException {
 		if(!validColumn(columnName))
 			throwsExceptionNotValidColumn();
-		if(existColumn(columnName))
-			return false;
 		listColumns.put(columnName, value);
-		return true;
 	}
 
 	

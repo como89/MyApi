@@ -8,7 +8,6 @@ import ca.como89.myapi.api.queries.CountRowsQuery;
 import ca.como89.myapi.api.queries.InsertQuery;
 import ca.como89.myapi.api.queries.SelectQuery;
 import ca.como89.myapi.api.queries.UpdateQuery;
-import ca.como89.myapi.api.sql.Columns;
 
 /**
  * The MyApi library. (MySQL, SQLite and NOSQL MongoDB library)
@@ -184,21 +183,17 @@ public interface MyApi {
 	/**
 	 * This method will check if the table exist in parameter.
 	 * @param tableName - The table name.
-	 * @return TableData - You can get the result and get response from the api.
+	 * @return boolean - True if exist and False, if not exist.
 	 * @throws IllegalArgumentException - If a parameter is null.
-	 * @deprecated - Use the new method. This method will be remove in future update.
 	 */
-	@Deprecated
-	public TableData checkIfTableExist(String tableName) throws IllegalArgumentException;
+	public boolean checkIfTableExist(String tableName) throws IllegalArgumentException;
 	
 	/**
 	 * This method will check if the column exist in parameter.
 	 * @param tableName - The table name.
 	 * @param columnName - The column name.
-	 * @return TableData - You can get the result and get response from the api.
+	 * @return boolean - True if exist and False, if not exist.
 	 * @throws IllegalArgumentException - If a parameter is null.
-	 * @deprecated - Use the new method. This method will be remove in future update.
 	 */
-	@Deprecated
-	public TableData checkIfColumnExist(String tableName, String columnName) throws IllegalArgumentException;
+	public boolean checkIfColumnExist(String tableName, String columnName) throws IllegalArgumentException;
 }

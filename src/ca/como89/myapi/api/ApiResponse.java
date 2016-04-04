@@ -1,5 +1,9 @@
 package ca.como89.myapi.api;
 
+/**
+ * This enum class is when the method return a ApiResponse. This response is to know if the method works or not.
+ *
+ */
 public enum ApiResponse {
 
 	/**

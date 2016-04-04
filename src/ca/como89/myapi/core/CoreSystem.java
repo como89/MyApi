@@ -18,6 +18,24 @@ import ca.como89.myapi.api.queries.PrefQuery;
 		this.apiDatabase = apiDatabase;
 	}
 	
+//	public static boolean checkAllValues(Object[] values){
+//	boolean correct = true;
+//	for(Object value : values){
+//		if(value == null)
+//			continue;
+//		if(!(value instanceof Integer) && 
+//				!(value instanceof Double) && 
+//				!(value instanceof String) && 
+//				!(value instanceof Character) && 
+//				!(value instanceof Float) && 
+//				!(value instanceof Boolean) && 
+//				!(value instanceof Long)){
+//			correct = false;
+//		}
+//	}
+//	return correct;
+//}
+	
 	protected String createStringValues(Object[] values) {
 		String valueString = "";
 		for (int i = 0; i < values.length; i++) {
@@ -41,10 +59,10 @@ import ca.como89.myapi.api.queries.PrefQuery;
 		String conditionString = "";
 		int sizeTotal = listCondition.size();
 		int index = 0;
-		if(prefQuery.useMultiCondition) {
+		if(prefQuery.multiCondition) {
 			for(Condition c : listCondition) {
 				conditionString += c.columnName + " "
-						+ c.typeCondition.getTypeInString() 
+						+ c.typeCondition.toString() 
 						+ " '" + c.value + "'"
 						+ (index + 1 < sizeTotal ? prefQuery.operator[index].toString():"") ;
 				index++;
@@ -52,7 +70,7 @@ import ca.como89.myapi.api.queries.PrefQuery;
 		} else if (listCondition.size() > 0) {
 			Condition c = listCondition.get(0);
 			conditionString += c.columnName + " "
-					+ c.typeCondition.getTypeInString() 
+					+ c.typeCondition.toString() 
 					+ " '" + c.value + "'";
 		}
 		return conditionString;

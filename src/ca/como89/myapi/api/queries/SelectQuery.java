@@ -2,15 +2,20 @@ package ca.como89.myapi.api.queries;
 
 import ca.como89.myapi.api.exceptions.NotValidColumnException;
 
+/**
+ * This class is when you need to select values in a table.
+ */
 public class SelectQuery extends ConditionQuery {
 	
 	private ResultObjects resultObjects; 
 
 	public SelectQuery() {
-		super(QueryType.SELECT);
 		resultObjects = null;
 	}
 	
+	/**
+	 * See addColumn(String) method in @Query class.
+	 */
 	@Override
 	public boolean addColumn(String columnName) throws NotValidColumnException {
 		if(!validColumn(columnName))
@@ -21,6 +26,10 @@ public class SelectQuery extends ConditionQuery {
 		return true;
 	}
 	
+	/**
+	 * This method return the Result objects with all data request by the query.
+	 * @return @ResultObjects class.
+	 */
 	public ResultObjects getResultObjects(){
 		ResultObjects result = resultObjects;
 		if(result == null) {
