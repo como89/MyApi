@@ -1,10 +1,12 @@
 MyApi
 =====
 
-Version 1.3
+Version : 2.0
 
-MySQL api for plugin developper.
+This library is an MySQL, SQLite and MongoDB api for java.
 
-If you want to know how to use my library, go to my wiki page : https://github.com/como89/MyApi/wiki
+You want to know how to use this library, go to this wiki : https://github.com/como89/MyApi/wiki
 
-Javadoc : http://como89.github.io/MyApi/doc/
+You can also see the javadoc (outdated for now) : http://como89.github.io/MyApi/doc/
+
+You have some questions, send me a msg to my twitter @como89 or to my gmail : como89.dev@gmail.com
