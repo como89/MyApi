@@ -1,4 +1,4 @@
-package ca.como89.myapi.api.queries;
+package ca.como89.myapi.api.conditions;
 
 /**
  * This enum class is when you want to add between two conditions an operator.

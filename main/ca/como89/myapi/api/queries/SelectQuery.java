@@ -28,7 +28,7 @@ public class SelectQuery extends ConditionQuery {
 	
 	/**
 	 * This method return the Result objects with all data request by the query.
-	 * @return @ResultObjects class.
+	 * @return a @ResultObjects class.
 	 */
 	public ResultObjects getResultObjects(){
 		ResultObjects result = resultObjects;

@@ -137,8 +137,9 @@ public class Mysql extends CoreSystem implements MyApi {
 		}
 		String valueString = createStringValues(values);
 		
-		stat.execute("INSERT INTO " + insertQuery.getTableName() + " ("
-				+ columnString + ") VALUES " + "(" + valueString + ")");
+		String query = "INSERT INTO " + insertQuery.getTableName() + " ("
+				+ columnString + ") VALUES " + "(" + valueString + ")";
+		stat.execute(query);
 			try {
 				stat.close();
 			} catch (SQLException e) {

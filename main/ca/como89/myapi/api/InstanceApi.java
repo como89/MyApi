@@ -33,6 +33,7 @@ public class InstanceApi {
 			myapi = new SQLite(apiDatabase);
 			break;
 		}
+		listApi.put(apiDatabase, myapi);
 		return myapi;
 	}
 	
@@ -42,15 +43,17 @@ public class InstanceApi {
 	 * @return the instance of the projectName. If the projectName, doesn't exist, it return null.
 	 */
 	public static MyApi getInstance(String projectName){
-		return getApiFromName(projectName);
+		ApiDatabase apiDatabase = getApiDatabaseByName(projectName);
+		return listApi.get(apiDatabase);
 	}
 	
 	/**
 	 * Method to remove the instance from the library.
 	 * @param projectName - The projectName.
 	 */
-	public static void removeInstance(String projectName){
-		MyApi myapi = getApiFromName(projectName);
+	public static MyApi removeInstance(String projectName){
+		ApiDatabase apiDatabase = getApiDatabaseByName(projectName);
+		MyApi myapi = listApi.remove(apiDatabase);
 		try {
 			if(myapi != null && myapi.isConnect() == ApiResponse.DATABASE_CONNECTED){
 				myapi.disconnect();
@@ -58,12 +61,13 @@ public class InstanceApi {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return myapi;
 	}
 	
-	private static MyApi getApiFromName(String projectName) {
+	private static ApiDatabase getApiDatabaseByName(String projectName) {
 		for(ApiDatabase apiDatabase : listApi.keySet()) {
 			if(apiDatabase.projectName.equals(projectName)) {
-				return listApi.get(apiDatabase);
+				return apiDatabase;
 			}
 		}
 		return null;

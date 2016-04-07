@@ -79,9 +79,9 @@ public abstract class Query {
 	protected boolean existColumn(String columnName) {
 		for(String columnsName : listColumns.keySet()) {
 			if(columnsName.equalsIgnoreCase(columnName)){
-				return false;
+				return true;
 			}
 		}
-		return true;
+		return false;
 	}
 }

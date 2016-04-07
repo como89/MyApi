@@ -51,6 +51,7 @@ import ca.como89.myapi.api.queries.PrefQuery;
 		for (String columnName : listColumnNames) {
 			columnString += columnName
 					+ (i + 1 < totalSize ? ", " : "");
+			i++;
 		}
 		return columnString;
 	}
@@ -64,7 +65,7 @@ import ca.como89.myapi.api.queries.PrefQuery;
 				conditionString += c.columnName + " "
 						+ c.typeCondition.toString() 
 						+ " '" + c.value + "'"
-						+ (index + 1 < sizeTotal ? prefQuery.operator[index].toString():"") ;
+						+ (index + 1 < sizeTotal ? prefQuery.operator[index].toString() + " ":"") ;
 				index++;
 			}
 		} else if (listCondition.size() > 0) {

@@ -7,22 +7,22 @@ package ca.como89.myapi.api.conditions;
 public enum TypeCondition {
 	/**
 	 * EQUALS 
-	 *  ' = '
+	 *  | = |
 	 */
 	EQUALS("="),
 	/**
 	 * GREATER 
-	 *  ' > '
+	 *  | > |
 	 */
 	GREATER(">"),
 	/**
 	 * SMALLER 
-	 *  ' < ' 
+	 *  | < | 
 	 */
 	SMALLER("<"),
 	/**
 	 * NOT_EQUALS
-	 *  ' != ' 
+	 *  | != | 
 	 */
 	NOT_EQUALS("!=");
 	

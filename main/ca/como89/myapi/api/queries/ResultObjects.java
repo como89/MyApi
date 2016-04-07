@@ -25,7 +25,7 @@ public class ResultObjects {
 	/**
 	 * This method will return a list of object from the column specified.
 	 * @param columnName - The column name.
-	 * @return a ArrayList<Object> with all values from the query. This arrayList is empty, if no value exist.
+	 * @return a ArrayList with all values from the query. This arrayList is empty, if no value exist.
 	 */
 	public ArrayList<Object> getListObjectFromColumn(String columnName) {
 		return listResult.get(columnName);

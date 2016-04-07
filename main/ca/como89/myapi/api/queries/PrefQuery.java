@@ -1,5 +1,7 @@
 package ca.como89.myapi.api.queries;
 
+import ca.como89.myapi.api.conditions.Operator;
+
 /**
  * This class is the preference of the Query when you want to use the multiCondition.
  */

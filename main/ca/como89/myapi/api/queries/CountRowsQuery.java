@@ -17,7 +17,7 @@ public class CountRowsQuery extends ConditionQuery {
 	
 	/**
 	 * This method return the rows count in the table.
-	 * @return
+	 * @return Integer - the nb of Rows in the table.
 	 */
 	public int getNbRows() {
 		return nbRows;
